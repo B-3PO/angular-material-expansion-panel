@@ -6,12 +6,14 @@ var autoprefixer = require('gulp-autoprefixer');
 var gulpFilter = require('gulp-filter');
 var concat = require('gulp-concat');
 var cssnano = require('gulp-cssnano');
+var sass = require('gulp-sass');
 
 exports.getDev = function (srcs) {
   srcs = srcs || paths.css.concat(paths.appCss);
 
   return function dev() {
     return gulp.src(srcs)
+      .pipe(sass())
       .pipe(autoprefixer())
       .pipe(gulp.dest(paths.dest))
       .on('end', function(){
@@ -24,6 +26,7 @@ exports.getDev = function (srcs) {
 
 exports.release = function () {
   return gulp.src(paths.css)
+    .pipe(sass())
     .pipe(concat())
     .pipe(autoprefixer())
     .pipe(rename('md-expansion-panel.css'))

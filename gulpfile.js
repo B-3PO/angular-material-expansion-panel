@@ -12,7 +12,8 @@ var indexBuild = require('./gulp/indexBuild');
 
 
 
-gulp.task('jsBuild', jsBuild.getDev());
+gulp.task('jsSrcBuild', jsBuild.getDevSrc());
+gulp.task('jsAppBuild', jsBuild.getDevApp());
 gulp.task('cssBuild', cssBuild.getDev());
 gulp.task('indexBuild', indexBuild.inject);
 
@@ -24,7 +25,8 @@ gulp.task('default', gulpSequence('buildLocal', ['serve', 'watch']));
 gulp.task('buildLocal', gulpSequence(
   'clean',
   [
-    'jsBuild',
+    'jsSrcBuild',
+    'jsAppBuild',
     'cssBuild',
     'copyPartials'
   ],
@@ -53,8 +55,15 @@ gulp.task('serve', serve({
 
 
 gulp.task('watch', function () {
-  gulp.watch(paths.scripts.concat(paths.appScripts), function (event) {
-    jsBuild.getDev(event.path)()
+  gulp.watch(paths.scripts, function (event) {
+    jsBuild.getDevSrc(event.path)()
+      .on('end', function () {
+        if (event.type !== 'changed') { indexBuild.inject(); }
+      });
+  });
+
+  gulp.watch(paths.appScripts, function (event) {
+    jsBuild.getDevApp(event.path)()
       .on('end', function () {
         if (event.type !== 'changed') { indexBuild.inject(); }
       });

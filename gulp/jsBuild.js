@@ -12,11 +12,27 @@ var gutil = require('gulp-util');
 
 
 
-exports.getDev = function (srcs) {
-  srcs = srcs || paths.scripts.concat(paths.appScripts);
+exports.getDevSrc = function (srcs) {
+  srcs = srcs || paths.scripts;
+  console.log(srcs);
+  return function dev() {
+    return gulp.src(srcs, {base: paths.src})
+      .pipe(wrap('(function(){"use strict";<%= contents %>}());'))
+      .pipe(jshint())
+      .pipe(jshint.reporter('default'))
+      .pipe(gulp.dest(paths.dest))
+      .on('end', function() {
+        gutil.log(gutil.colors.green('✔ JS Dev'), 'Finished');
+      });
+  };
+}
+
+
+exports.getDevApp = function (srcs) {
+  srcs = srcs || paths.appScripts;
 
   return function dev() {
-    return gulp.src(srcs)
+    return gulp.src(srcs, {base: paths.app})
       .pipe(wrap('(function(){"use strict";<%= contents %>}());'))
       .pipe(jshint())
       .pipe(jshint.reporter('default'))

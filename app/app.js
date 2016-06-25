@@ -2,7 +2,7 @@ angular.module('angularMaterialExpansionPanel', [
   'ngRoute',
   'ngAnimate',
   'ngMaterial',
-  'mdExpansionPanel'
+  'material.components.expansionPanels'
 ])
   .config(configApp);
 
