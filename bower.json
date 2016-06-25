@@ -39,5 +39,5 @@
   },
   "devDependencies": {
     "angular-route": "^1.4.0",
-  },
+  }
 }
