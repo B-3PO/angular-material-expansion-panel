@@ -16,9 +16,48 @@ This module is **In Progress** currently and should not be used in production. Y
 
 Quick Links:
 * [Installation](#installaton)
-* [Usage](#usage)
 * [Building](#building)
+* [Usage](#usage)
 * [Documentation](#documentation)
+
+
+
+## <a name="installation"></a> Installation
+
+#### Bower
+
+Change to your project's root directory.
+
+```bash
+# To install latest
+bower install angular-material-expansion-panel
+
+# To install latest and update bower.json
+bower install angular-material-expansion-panel --save
+
+# update after install
+bower update
+```
+
+
+#### Npm
+
+Change to your project's root directory.
+
+```bash
+# To install latest
+npm install angular-material-expansion-panel
+
+# To install latest and update package.json
+npm install angular-material-expansion-panel --save
+```
+
+
+Include the `material.components.expansionPanels` module as a dependency in your application.
+
+```javascript
+angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
+```
 
 
 
@@ -37,19 +76,6 @@ gulp
 # To build the js and css files to the `/build` directory
 gulp build
 ```
-
-
-
-## <a name="installation"></a> Installation
-
-This package will be available on both npm and bower
-
-Include the `material.components.expansionPanels` module as a dependency in your application.
-
-```javascript
-angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
-```
-
 
 
 
