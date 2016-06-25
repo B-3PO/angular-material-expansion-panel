@@ -34,9 +34,6 @@ bower install angular-material-expansion-panel
 
 # To install latest and update bower.json
 bower install angular-material-expansion-panel --save
-
-# update after install
-bower update
 ```
 
 
