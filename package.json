@@ -5,7 +5,6 @@
   "description": "Material Design Expansion Panels.",
   "keywords": "browser, material, material-design, design, angular, css, components, expansion, panel, panels",
   "license": "MIT",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/B-3PO/angular-material-expansion-panel.git"
