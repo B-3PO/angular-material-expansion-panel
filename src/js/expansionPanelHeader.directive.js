@@ -3,6 +3,20 @@ angular
   .directive('mdExpansionPanelHeader', expansionPanelHeaderDirective);
 
 
+
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelHeader
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelHeader` is nested inside of `mdExpansionPanelExpanded` and contains content you want in place of the collapsed content
+ * this is optional
+ *
+ * @param {=} md-no-sticky - add this aatribute to disable sticky
+ **/
 expansionPanelHeaderDirective.$inject = [];
 function expansionPanelHeaderDirective() {
   var directive = {

@@ -3,6 +3,19 @@ angular
   .directive('mdExpansionPanelExpanded', expansionPanelExpandedDirective);
 
 
+
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelExpanded
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelExpanded` is used to contain content when the panel is expanded
+ *
+ * @param {number=} height - add this aatribute set the max height of the expanded content. The container will be set to scroll
+ **/
 expansionPanelExpandedDirective.$inject = ['$animateCss'];
 function expansionPanelExpandedDirective($animateCss) {
   var directive = {
