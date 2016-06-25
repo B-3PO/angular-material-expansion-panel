@@ -7,6 +7,7 @@ var gulpFilter = require('gulp-filter');
 var concat = require('gulp-concat');
 var cssnano = require('gulp-cssnano');
 var sass = require('gulp-sass');
+var rename = require('gulp-rename');
 
 exports.getDev = function (srcs) {
   srcs = srcs || paths.css.concat(paths.appCss);
@@ -27,9 +28,8 @@ exports.getDev = function (srcs) {
 exports.release = function () {
   return gulp.src(paths.css)
     .pipe(sass())
-    .pipe(concat())
+    .pipe(concat('md-expansion-panel.css'))
     .pipe(autoprefixer())
-    .pipe(rename('md-expansion-panel.css'))
     .pipe(gulp.dest(paths.build))
     .pipe(cssnano())
     .pipe(rename('md-expansion-panel.min.css'))

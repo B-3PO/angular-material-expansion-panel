@@ -4,6 +4,7 @@ var gulp = require('gulp');
 var serve = require('gulp-serve');
 var gulpSequence = require('gulp-sequence');
 var del = require('del');
+var bump = require('gulp-bump');
 
 
 var jsBuild = require('./gulp/jsBuild');
@@ -14,7 +15,9 @@ var indexBuild = require('./gulp/indexBuild');
 
 gulp.task('jsSrcBuild', jsBuild.getDevSrc());
 gulp.task('jsAppBuild', jsBuild.getDevApp());
+gulp.task('jsReleaseBuild', jsBuild.release);
 gulp.task('cssBuild', cssBuild.getDev());
+gulp.task('cssReleaseBuild', cssBuild.release);
 gulp.task('indexBuild', indexBuild.inject);
 
 
@@ -32,6 +35,8 @@ gulp.task('buildLocal', gulpSequence(
   ],
   'indexBuild'
 ));
+
+gulp.task('build', ['jsReleaseBuild', 'cssReleaseBuild']);
 
 
 
@@ -82,4 +87,33 @@ gulp.task('watch', function () {
     return gulp.src(event.path, {base: paths.app})
       .pipe(gulp.dest(paths.dest));
   });
+});
+
+
+
+
+
+
+gulp.task('major', function(){
+  gulp.src(['./bower.json', './package.json'])
+  .pipe(bump({type:'major'}))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('minor', function(){
+  gulp.src(['./bower.json', './package.json'])
+  .pipe(bump({type:'minor'}))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('patch', function(){
+  gulp.src(['./bower.json', './package.json'])
+  .pipe(bump({type:'patch'}))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('prerelease', function(){
+  gulp.src(['./bower.json', './package.json'])
+  .pipe(bump({type:'prerelease'}))
+  .pipe(gulp.dest('./'));
 });
