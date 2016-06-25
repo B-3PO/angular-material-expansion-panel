@@ -38,6 +38,6 @@
     "angular-material": "^1.0.0"
   },
   "devDependencies": {
-    "angular-route": "^1.4.0",
+    "angular-route": "^1.4.0"
   }
 }
