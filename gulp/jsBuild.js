@@ -14,7 +14,7 @@ var gutil = require('gulp-util');
 
 exports.getDevSrc = function (srcs) {
   srcs = srcs || paths.scripts;
-  console.log(srcs);
+  
   return function dev() {
     return gulp.src(srcs, {base: paths.src})
       .pipe(wrap('(function(){"use strict";<%= contents %>}());'))

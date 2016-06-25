@@ -3,8 +3,15 @@ angular
   .controller('HomeController', HomeController);
 
 
-function HomeController($scope) {
-  $scope.collapse = function () {
-    console.log($scope);
+function HomeController($scope, $mdExpansionPanel) {
+  $mdExpansionPanel('expansionPanelOne').then(function (instance) {
+    instance.expand();
+  });
+
+
+  $scope.collapseOne = function () {
+    $mdExpansionPanel('expansionPanelOne').then(function (instance) {
+      instance.collapse();
+    });
   };
 }

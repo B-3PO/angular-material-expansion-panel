@@ -198,8 +198,8 @@ function expansionPanelDirective() {
 
 
     function updateScroll(e) {
-      var top
-      var bottom
+      var top;
+      var bottom;
       var bounds;
       if (expandedCtrl.setHeight === true) {
         bounds = expandedCtrl.$element[0].getBoundingClientRect();
