@@ -2,6 +2,18 @@ angular
   .module('material.components.expansionPanels')
   .directive('mdExpansionPanel', expansionPanelDirective);
 
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanel
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanel` is the main container for panels
+ *
+ * @param {string=} md-component-id - add an id if you want to acces the panel via the `$mdExpansionPanel` service
+ **/
 function expansionPanelDirective() {
   var directive = {
     restrict: 'E',

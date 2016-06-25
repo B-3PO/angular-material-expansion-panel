@@ -3,6 +3,22 @@ angular
   .directive('mdExpansionPanelFooter', expansionPanelFooterDirective);
 
 
+
+
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelFooter
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelFooter` is nested inside of `mdExpansionPanelExpanded` and contains content you want at the bottom.
+ * By default the Footer will stick to the bottom of the page if the panel expands past
+ * this is optional
+ *
+ * @param {=} md-no-sticky - add this aatribute to disable sticky
+ **/
 function expansionPanelFooterDirective() {
   var directive = {
     restrict: 'E',

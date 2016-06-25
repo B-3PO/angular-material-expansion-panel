@@ -3,6 +3,17 @@ angular
   .directive('mdExpansionPanelCollapsed', expansionPanelCollapsedDirective);
 
 
+
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelCollapsed
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelCollapsed` is used to contain content when the panel is collapsed
+ **/
 expansionPanelCollapsedDirective.$inject = ['$animateCss'];
 function expansionPanelCollapsedDirective($animateCss) {
   var directive = {
