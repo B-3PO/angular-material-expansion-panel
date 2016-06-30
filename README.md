@@ -117,10 +117,125 @@ gulp build
 
 ## <a name="documentation"></a> Documentation
 
-Documentation Coming Soon :)
+To add Expansion Panels to you angular-material project, include the `material.components.expansionPanels` module as a dependency in your application.
 
-If you can't wait then just give it a try.
+```javascript
+angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
+```
 
-`md-expansion-panel-expanded` can have a height attribute added to it that will cause it to scroll if the content is longer that what you specified
+* [mdExpansionPanel](#mdExpansionPanel)
+* [mdExpansionPanelCollapsed](#mdExpansionPanelCollapsed)
+* [mdExpansionPanelExpanded](#mdExpansionPanelExpanded)
+* [mdExpansionPanelHeader](#mdExpansionPanelHeader)
+* [mdExpansionPanelFooter](#mdExpansionPanelFooter)
+* [$mdExpansionPanel](#$mdExpansionPanel)
 
-By default both `md-expansion-panel-header` and `md-expansion-panel-footer` are sticky. If you want to disable that, then just add the `md-no-sticky` attribute on either element
+
+#### Directives
+
+## mdExpansionPanel
+
+`mdExpansionPanel` is the main container for panels
+
+```
+<md-expansion-panel
+  [md-component-id=""]>
+...
+</md-expansion-panel>
+```
+
+#### Attributes
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| md-component-id | string= | <p>add an id if you want to acces the panel via the <code>$mdExpansionPanel</code> service</p>  |
+
+
+
+## mdExpansionPanelCollapsed
+
+`mdExpansionPanelCollapsed` is used to contain content when the panel is collapsed
+
+```
+<md-expansion-panel-collapsed>
+...
+</md-expansion-panel>
+```
+
+
+
+
+## mdExpansionPanelExpanded
+
+`mdExpansionPanelExpanded` is used to contain content when the panel is expanded
+
+```
+<md-expansion-panel-expanded
+  [height=""]>
+...
+</md-expansion-panel-expanded>
+```xpansion-panel>
+```
+
+#### Attributes
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| height | number= | <p>add this attribute set the max height of the expanded content. The container will be set to scroll</p>  |
+
+
+
+
+## mdExpansionPanelHeader
+
+`mdExpansionPanelHeader` is nested inside of `mdExpansionPanelExpanded` and contains content you want in place of the collapsed content
+this is optional
+
+```
+<md-expansion-panel-header
+  [md-no-sticky=""]>
+...
+</md-expansion-panel-header>
+```
+
+#### Attributes
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| md-no-sticky | boolean= | <p>add this aatribute to disable sticky</p>  |
+
+
+
+## mdExpansionPanelFooter
+
+`mdExpansionPanelFooter` is nested inside of `mdExpansionPanelExpanded` and contains content you want at the bottom.
+By default the Footer will stick to the bottom of the page if the panel expands past
+this is optional
+
+```
+<md-expansion-panel-footer
+  [md-no-sticky=""]>
+...
+</md-expansion-panel-footer>
+```
+
+#### Attributes
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| md-no-sticky | boolean= | <p>add this aatribute to disable sticky</p>  |
+
+
+
+### Services
+
+## $mdExpansionPanel
+
+Expand and collapse Expansion Panel using its `md-component-id`
+
+```javascript
+$mdExpansionPanel('theComponentId').then(function (instance) {
+  instance.expand();
+  instance.contract();
+});
+```
