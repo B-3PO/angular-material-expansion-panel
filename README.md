@@ -17,6 +17,7 @@ This module is **In Progress** currently and should not be used in production. Y
 Quick Links:
 * [Installation](#installaton)
 * [Building](#building)
+* [Run Tests](#test)
 * [Usage](#usage)
 * [Documentation](#documentation)
 
@@ -50,6 +51,18 @@ npm install angular-material-expansion-panel --save
 ```
 
 
+#### setup
+
+install modules
+
+```bash
+# install npm modules
+npm install
+
+# install bower components
+bower install
+```
+
 Include the `material.components.expansionPanels` module as a dependency in your application.
 
 ```javascript
@@ -63,6 +76,8 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 
 You can easily build using gulp.
 
+The built files will be created in the `dist` folder
+
 Run the **gulp** tasks:
 
 ```bash
@@ -72,6 +87,16 @@ gulp
 
 # To build the js and css files to the `/build` directory
 gulp build
+```
+
+
+## <a name="tests"></a> Run Tests
+
+Test using Karma
+Run the **gulp** tasks:
+
+```bash
+gulp test
 ```
 
 
