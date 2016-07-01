@@ -17,7 +17,7 @@ angular
  * By default the Footer will stick to the bottom of the page if the panel expands past
  * this is optional
  *
- * @param {=} md-no-sticky - add this aatribute to disable sticky
+ * @param {boolean=} md-no-sticky - add this aatribute to disable sticky
  **/
 function expansionPanelFooterDirective() {
   var directive = {

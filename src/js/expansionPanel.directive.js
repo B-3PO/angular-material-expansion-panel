@@ -28,7 +28,16 @@ function expansionPanelDirective() {
 
 
   function compile(tElement, tAttrs) {
+    var INVALID_PREFIX = 'Invalid HTML for md-expansion-panel: ';
+
     tElement.attr('tabindex', tAttrs.tabindex || '0');
+
+    if (tElement[0].querySelector('md-expansion-panel-collapsed') === null) {
+      throw Error(INVALID_PREFIX + 'Expected a child element of `md-epxansion-panel-collapsed`');
+    }
+    if (tElement[0].querySelector('md-expansion-panel-expanded') === null) {
+      throw Error(INVALID_PREFIX + 'Expected a child element of `md-epxansion-panel-expanded`');
+    }
 
     return function postLink(scope, element, attrs, ctrls) {
       var epxansionPanelCtrl = ctrls[0];
@@ -69,10 +78,10 @@ function expansionPanelDirective() {
     vm.expand = expand;
     vm.collapse = collapse;
 
-
     $attrs.$observe('disabled', function(disabled) {
-      isDisabled = disabled;
-      if (disabled === true) {
+      isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
+
+      if (isDisabled === true) {
         $element.attr('tabindex', '-1');
       } else {
         $element.attr('tabindex', '0');
@@ -89,7 +98,6 @@ function expansionPanelDirective() {
 
     function handleKeypress(ev) {
       var keyCodes = $mdConstant.KEY_CODE;
-
       switch (ev.keyCode) {
         case keyCodes.ENTER:
           expand();

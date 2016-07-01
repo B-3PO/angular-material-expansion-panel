@@ -42,7 +42,7 @@ function expansionPanelExpandedDirective($animateCss) {
 
     function hide() {
       var height = setHeight ? setHeight : element[0].scrollHeight + 'px';
-      element.addClass('md-hide');
+      element.addClass('md-hide md-overflow');
       element.removeClass('md-show md-scroll-y');
 
       $animateCss(element, {
@@ -51,12 +51,14 @@ function expansionPanelExpandedDirective($animateCss) {
       })
       .start()
       .then(function () {
+        element.css('display', 'none');
         element.removeClass('md-hide');
       });
     }
 
 
     function show() {
+      element.css('display', '');
       element.addClass('md-show md-overflow');
 
       // use passed in height or the contents height

@@ -51,11 +51,14 @@ function expansionPanelCollapsedDirective($animateCss) {
       .start()
       .then(function () {
         element.removeClass('md-hide');
+        element.css('display', 'none');
       });
     }
 
 
     function show() {
+      element.css('display', '');
+
       // set width to maintian demensions when element is set to postion: absolute
       element.css('width', element[0].parentNode.offsetWidth + 'px');
 

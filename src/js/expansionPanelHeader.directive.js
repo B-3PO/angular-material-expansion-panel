@@ -15,7 +15,7 @@ angular
  * `mdExpansionPanelHeader` is nested inside of `mdExpansionPanelExpanded` and contains content you want in place of the collapsed content
  * this is optional
  *
- * @param {=} md-no-sticky - add this aatribute to disable sticky
+ * @param {boolean=} md-no-sticky - add this aatribute to disable sticky
  **/
 expansionPanelHeaderDirective.$inject = [];
 function expansionPanelHeaderDirective() {
@@ -54,7 +54,7 @@ function expansionPanelHeaderDirective() {
 
     function onScroll(top) {
       var bounds = element[0].getBoundingClientRect();
-
+      
       if (bounds.top < top) {
         // set container width because element becomes postion fixed
         container.css('width', element[0].offsetWidth + 'px');
