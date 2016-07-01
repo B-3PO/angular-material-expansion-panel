@@ -24,7 +24,6 @@ exports.getDev = function (srcs) {
 };
 
 
-
 exports.release = function () {
   return gulp.src(paths.css)
     .pipe(sass())

@@ -9,7 +9,7 @@ exports.inject = function () {
   var scripts = gulp.src(paths.scripts, {read: false});
   var appScripts = gulp.src(paths.appScripts, {read: false});
   var appCss = gulp.src(paths.appCss, {read: false});
-  var bower = gulp.src(paths.bower).pipe(mainBowerFiles());
+  var bower = gulp.src(paths.bower).pipe(mainBowerFiles({includeDev: true}));
   var css = gulp.src(paths.injectCss, {read: false});
 
   return gulp.src(paths.app + 'index.html')

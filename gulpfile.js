@@ -5,6 +5,7 @@ var serve = require('gulp-serve');
 var gulpSequence = require('gulp-sequence');
 var del = require('del');
 var bump = require('gulp-bump');
+var KarmaServer = require('karma').Server;
 
 
 var jsBuild = require('./gulp/jsBuild');
@@ -55,6 +56,23 @@ gulp.task('serve', serve({
   port: 8080
 }));
 
+
+
+gulp.task('test-karma', function (done) {
+  new KarmaServer({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }, function (errorCode) {
+    if (errorCode !== 0) {
+      console.log('Karma exited with error code ' + errorCode);
+      done();
+      return process.exit(errorCode);
+    }
+    done();
+  }).start();
+});
+
+gulp.task('test', gulpSequence('build', 'test-karma'));
 
 
 
