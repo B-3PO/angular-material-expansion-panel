@@ -4,8 +4,7 @@ A module that implements design elements based on [Material Design](https://mate
 
 To see Material Design Expansion Panels Specification go [here](https://material.google.com/components/expansion-panels.html).
 
-
-This module is **In Progress** currently and should not be used in production. You can expect a tested and documented version in the near future.
+The expansion panel component can be used with just html or you can use the Expansion Panel Group to control multiple panels through code
 
 
 <div style="border: 1px solid #ccc">

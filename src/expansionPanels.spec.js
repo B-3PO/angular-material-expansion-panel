@@ -1,5 +1,6 @@
 describe('material.components.expansionPanels', function () {
   var panel;
+  var group;
   var scope;
   var content;
   var $mdUtil;
@@ -39,6 +40,12 @@ describe('material.components.expansionPanels', function () {
     panel = undefined;
     scope = undefined;
 
+    if (group) {
+      group.scope().$destroy();
+      group.remove();
+      group = undefined;
+    }
+
     if (content) {
       content.remove();
       content = undefined;
@@ -53,23 +60,6 @@ describe('material.components.expansionPanels', function () {
   // --- Expansion Panel Service ---
 
   describe('$mdExpansionPanel Service', function () {
-
-    // it('should expand panel', function (done) {
-    //   var element = getDirective();
-    //   inject(function ($mdExpansionPanel) {
-    //
-    //     $mdExpansionPanel('expansionPanelId').then(function (instance) {
-    //       console.log(element);
-    //       // instance.expand();
-    //       // flushAnimations();
-    //       // expect(element.hasClass('md-open')).toBe(false);
-    //       expect(true).toBe(true);
-    //       done();
-    //     });
-    //   });
-    // });
-
-
     it('should find instance by id', inject(function($mdExpansionPanel) {
       var instance;
 
@@ -78,7 +68,7 @@ describe('material.components.expansionPanels', function () {
       });
       expect(instance).toBeUndefined();
 
-      var element = getDirective();
+      var element = getDirective({componentId: 'expansionPanelId'});
       $timeout.flush();
 
       expect(instance).toBeDefined();
@@ -90,7 +80,7 @@ describe('material.components.expansionPanels', function () {
         instance.expand();
       });
 
-      var element = getDirective();
+      var element = getDirective({componentId: 'expansionPanelId'});
       flushAnimations();
 
       expect(element.hasClass('md-open')).toBe(true);
@@ -103,11 +93,114 @@ describe('material.components.expansionPanels', function () {
         instance.collapse();
       });
 
-      var element = getDirective();
+      var element = getDirective({componentId: 'expansionPanelId'});
       flushAnimations();
 
       expect(element.hasClass('md-close')).toBe(true);
-    }));close
+    }));
+
+    it('should remove panel', inject(function($mdExpansionPanel) {
+      $mdExpansionPanel('expansionPanelId').then(function(instance) {
+        instance.remove();
+      });
+
+      var element = getDirective({componentId: 'expansionPanelId'});
+      expect(element.scope()).toBeUndefined();
+    }));
+
+  });
+
+
+
+
+
+
+  // --- Expansion Panel Group Service ---
+
+  describe('$mdExpansionPanelGroup Service', function () {
+
+    it('should find instance by id', inject(function($mdExpansionPanelGroup) {
+      var instance;
+
+      $mdExpansionPanelGroup('expansionPanelGroupId').then(function(inst) {
+        instance = inst;
+      });
+      expect(instance).toBeUndefined();
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(instance).toBeDefined();
+    }));
+
+
+    it('should register panel and add it', inject(function($mdExpansionPanelGroup) {
+      var instance;
+      var panelInstance;
+
+      $mdExpansionPanelGroup('expansionPanelGroupId').then(function(inst) {
+        instance = inst;
+        inst.register('panelName', {
+          template: getTemplate(),
+          controller: function () {}
+        });
+
+        inst.add('panelName').then(function (_panelInstance) {
+          panelInstance = _panelInstance;
+        });
+      });
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(panelInstance).toBeDefined();
+    }));
+
+
+    it('should remove added panel', inject(function($mdExpansionPanelGroup) {
+      var instance;
+
+      $mdExpansionPanelGroup('expansionPanelGroupId').then(function(inst) {
+        instance = inst;
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelId'}),
+          controller: function () {}
+        });
+
+        inst.remove('expansionPanelId');
+      });
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(element[0].querySelector('[md-component-id="expansionPanelId"]')).toBe(null);
+    }));
+
+
+    it('should remove all panels', inject(function($mdExpansionPanelGroup) {
+      var instance;
+
+      $mdExpansionPanelGroup('expansionPanelGroupId').then(function(inst) {
+        instance = inst;
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelOne'}),
+          controller: function () {}
+        });
+
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelTwo'}),
+          controller: function () {}
+        });
+
+        inst.removeAll();
+      });
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(element[0].querySelector('[md-component-id="expansionPanelOne"]')).toBe(null);
+      expect(element[0].querySelector('[md-component-id="expansionPanelTwo"]')).toBe(null);
+    }));
 
   });
 
@@ -156,6 +249,13 @@ describe('material.components.expansionPanels', function () {
       collapsePanel();
       expect(element.hasClass('md-close')).toBe(true);
     });
+
+
+    it('should remove panel', inject(function($mdExpansionPanel) {
+      var element = getDirective();
+      element.scope().$panel.remove();
+      expect(element.scope()).toBeUndefined();
+    }));
 
 
     describe('Focused', function () {
@@ -511,8 +611,29 @@ describe('material.components.expansionPanels', function () {
   function getDirective(options) {
     options = options || {};
 
-    var template = $mdUtil.supplant('{2}' +
-    '<md-expansion-panel {0} md-component-id="expansionPanelId">'+
+    var template = getTemplate(options);
+
+    inject(function($compile, $rootScope) {
+      scope = $rootScope.$new();
+      panel = $compile(template)(scope);
+    });
+
+    document.body.appendChild(panel[0]);
+
+    if (options.content) {
+      content = panel;
+      panel = content.find('md-expansion-panel');
+    }
+
+    panel.scope().$digest();
+    return panel;
+  }
+
+  function getTemplate(options) {
+    options = options || {};
+
+    return $mdUtil.supplant('{2}' +
+    '<md-expansion-panel {0}{6}>'+
       '><md-expansion-panel-collapsed>'+
         '<div class="md-title">Title</div>'+
         '<div class="md-summary">Summary</div>'+
@@ -541,21 +662,29 @@ describe('material.components.expansionPanels', function () {
       options.footerNoStick ? ' md-no-sticky ' : '',
       options.componentId ? ' md-component-id="'+options.componentId+'" ' : ''
     ]);
+  }
+
+
+
+  function getGroupDirective(options) {
+    options = options || {};
+
+    var template = $mdUtil.supplant('' +
+    '<md-expansion-panel-group {0} {1} md-component-id="expansionPanelGroupId">'+
+    '</md-expansion-panel-group>',
+    [
+      options.multiple ? ' multiple ' : '',
+      options.autoExpand ? ' auto-exapnd ' : ''
+    ]);
 
     inject(function($compile, $rootScope) {
-      scope = $rootScope.$new();
-      panel = $compile(template)(scope);
+      group = $compile(template)($rootScope.$new());
     });
 
-    document.body.appendChild(panel[0]);
+    document.body.appendChild(group[0]);
 
-    if (options.content) {
-      content = panel;
-      panel = content.find('md-expansion-panel');
-    }
-
-    panel.scope().$digest();
-    return panel;
+    group.scope().$digest();
+    return group;
   }
 
 
