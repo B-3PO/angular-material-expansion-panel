@@ -14,6 +14,10 @@ angular
   .module('material.components.expansionPanels')
   .directive('mdExpansionPanel', expansionPanelDirective);
 
+
+var ANIMATION_TIME = 180; //ms
+
+
 /**
  * @ngdoc directive
  * @name mdExpansionPanel
@@ -32,7 +36,7 @@ function expansionPanelDirective() {
     require: ['mdExpansionPanel', '?^^mdExpansionPanelGroup'],
     scope: true,
     compile: compile,
-    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', controller]
+    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', controller]
   };
   return directive;
 
@@ -54,16 +58,22 @@ function expansionPanelDirective() {
     return function postLink(scope, element, attrs, ctrls) {
       var epxansionPanelCtrl = ctrls[0];
       var epxansionPanelGroupCtrl = ctrls[1];
-      var componentId = attrs.mdComponentId;
 
-      epxansionPanelCtrl.componentId = componentId;
+      if (epxansionPanelGroupCtrl) {
+        epxansionPanelCtrl.epxansionPanelGroupCtrl = epxansionPanelGroupCtrl;
+        epxansionPanelGroupCtrl.addPanel(epxansionPanelCtrl.componentId, {
+          expand: epxansionPanelCtrl.expand,
+          collapse: epxansionPanelCtrl.collapse,
+          remove: epxansionPanelCtrl.remove
+        });
+      }
     };
   }
 
 
 
 
-  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry) {
+  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q) {
     /* jshint validthis: true */
     var vm = this;
 
@@ -87,8 +97,10 @@ function expansionPanelDirective() {
     vm.registerFooter = function (ctrl) { footerCtrl = ctrl; };
 
     vm.$element = $element;
+    vm.componentId = $attrs.mdComponentId;
     vm.expand = expand;
     vm.collapse = collapse;
+    vm.remove = remove;
 
     $attrs.$observe('disabled', function(disabled) {
       isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
@@ -123,20 +135,24 @@ function expansionPanelDirective() {
 
     $scope.$panel = {
       collapse: collapse,
-      expand: expand
+      expand: expand,
+      remove: remove
     };
 
 
     $scope.$on('$destroy', function () {
       // remove component from registry
       if (typeof deregister === 'function') { deregister(); }
+      killEvents();
     });
 
 
     if ($attrs.mdComponentId) {
       deregister = $mdComponentRegistry.register({
         expand: expand,
-        collapse: collapse
+        collapse: collapse,
+        remove: remove,
+        componentId: $attrs.mdComponentId
       }, $attrs.mdComponentId);
     }
 
@@ -145,6 +161,12 @@ function expansionPanelDirective() {
     function expand() {
       if (isOpen === true || isDisabled === true) { return; }
       isOpen = true;
+
+      var deferred = $q.defer();
+
+      if (vm.epxansionPanelGroupCtrl) {
+        vm.epxansionPanelGroupCtrl.expandPanel(vm.componentId);
+      }
 
       $element.removeClass('md-close');
       $element.addClass('md-open');
@@ -155,12 +177,19 @@ function expansionPanelDirective() {
 
       if (headerCtrl) { headerCtrl.show(); }
       if (footerCtrl) { footerCtrl.show(); }
+
+      $timeout(function () {
+        deferred.resolve();
+      }, ANIMATION_TIME);
+      return deferred.promise;
     }
 
 
     function collapse() {
       if (isOpen === false) { return; }
       isOpen = false;
+
+      var deferred = $q.defer();
 
       $element.addClass('md-close');
       $element.removeClass('md-open');
@@ -171,6 +200,35 @@ function expansionPanelDirective() {
 
       if (headerCtrl) { headerCtrl.hide(); }
       if (footerCtrl) { footerCtrl.hide(); }
+
+      $timeout(function () {
+        deferred.resolve();
+      }, ANIMATION_TIME);
+      return deferred.promise;
+    }
+
+
+    function remove(noAnimation) {
+      var deferred = $q.defer();
+
+      if (vm.epxansionPanelGroupCtrl) {
+        vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
+      }
+
+      if (noAnimation === true || isOpen === false) {
+        $scope.$destroy();
+        $element.remove();
+        deferred.resolve();
+      } else {
+        collapse();
+        $timeout(function () {
+          $scope.$destroy();
+          $element.remove();
+          deferred.resolve();
+        }, ANIMATION_TIME);
+      }
+
+      return deferred.promise;
     }
 
 
@@ -215,7 +273,7 @@ function expansionPanelDirective() {
         resizeKiller = undefined;
       }
 
-      if (scrollContainer.nodeName === 'MD-CONTENT') {
+      if (scrollContainer && scrollContainer.nodeName === 'MD-CONTENT') {
         angular.element(scrollContainer).off('scroll', debouncedUpdateScroll);
       }
 
@@ -553,6 +611,254 @@ function expansionPanelFooterDirective() {
 }());
 (function(){"use strict";angular
   .module('material.components.expansionPanels')
+  .directive('mdExpansionPanelGroup', expansionPanelGroupDirective);
+
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelGroup
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelGroup` is a container used to manage multiple expansion panels
+ *
+ * @param {string=} md-component-id - add an id if you want to acces the panel via the `$mdExpansionPanelGroup` service
+ * @param {string=} auto-expand - panels expand when added to `<md-expansion-panel-group>`
+ * @param {string=} multiple - allows for more than one panel to be expanded at a time
+ **/
+function expansionPanelGroupDirective() {
+  var directive = {
+    restrict: 'E',
+    controller: ['$scope', '$attrs', '$element', '$mdComponentRegistry', controller]
+  };
+  return directive;
+
+
+  function controller($scope, $attrs, $element, $mdComponentRegistry) {
+    /* jshint validthis: true */
+    var vm = this;
+
+    var registered = {};
+    var panels = {};
+    var multipleExpand = $attrs.mdMultiple !== undefined || $attrs.multiple !== undefined;
+    var autoExpand = $attrs.mdAutoExpand !== undefined || $attrs.autoExpand !== undefined;
+
+
+    vm.destroy = $mdComponentRegistry.register({
+      $element: $element,
+      register: register,
+      getRegistered: getRegistered,
+      remove: remove,
+      removeAll: removeAll
+    }, $attrs.mdComponentId);
+
+    vm.addPanel = addPanel;
+    vm.expandPanel = expandPanel;
+    vm.removePanel = removePanel;
+
+
+    $scope.$on('$destroy', function () {
+      if (typeof vm.destroy === 'function') { vm.destroy(); }
+    });
+
+
+    function addPanel(componentId, panelCtrl) {
+      panels[componentId] = panelCtrl;
+      if (autoExpand === true) {
+        panelCtrl.expand();
+        closeOthers(componentId);
+      }
+    }
+
+    function expandPanel(componentId) {
+      closeOthers(componentId);
+    }
+
+    function remove(componentId) {
+      return panels[componentId].remove();
+    }
+
+    function removeAll() {
+      Object.keys(panels).forEach(function (panelId) {
+        panels[panelId].remove();
+      });
+    }
+
+    function removePanel(componentId) {
+      delete panels[componentId];
+    }
+
+    function closeOthers(id) {
+      if (multipleExpand === false) {
+        Object.keys(panels).forEach(function (panelId) {
+          if (panelId !== id) { panels[panelId].collapse(); }
+        });
+      }
+    }
+
+
+    function register(name, options) {
+      if (registered[name] !== undefined) {
+        throw Error('$mdExpansionPanelGroup.register() The name "' + name + '" has already been registered');
+      }
+      registered[name] = options;
+    }
+
+
+    function getRegistered(name) {
+      if (registered[name] === undefined) {
+        throw Error('$mdExpansionPanelGroup.addPanel() Cannot find Panel with name of "' + name + '"');
+      }
+      return registered[name];
+    }
+  }
+}
+}());
+(function(){"use strict";angular
+  .module('material.components.expansionPanels')
+  .factory('$mdExpansionPanelGroup', expansionPanelGroupService);
+
+
+/**
+ * @ngdoc service
+ * @name $mdExpansionPanelGroup
+ * @module material.components.expansionPanels
+ *
+ * @description
+ * Expand and collapse Expansion Panel using its `md-component-id`
+ *
+ * @example
+ * $mdExpansionPanelGroup('comonentId').then(function (instance) {
+ *  instance.register({
+ *    componentId: 'cardComponentId',
+ *    templateUrl: 'template.html',
+ *    controller: 'Controller'
+ *  });
+ *  instance.add('cardComponentId', {local: localData});
+ *  instance.remove('cardComponentId');
+ *  instance.removeAll();
+ * });
+ */
+expansionPanelGroupService.$inject = ['$mdComponentRegistry', '$mdUtil', '$mdExpansionPanel', '$templateRequest', '$rootScope', '$compile', '$controller', '$q'];
+function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionPanel, $templateRequest, $rootScope, $compile, $controller, $q) {
+  return function (handle) {
+    var instance;
+    var service = {
+      add: add,
+      register: register,
+      remove: remove,
+      removeAll: removeAll
+    };
+
+    return $mdComponentRegistry
+        .when(handle)
+        .then(function (it) {
+          instance = it;
+          return service;
+        });
+
+
+
+    function register(name, options) {
+      if (typeof name !== 'string') {
+        throw Error('$mdExpansionPanelGroup.register() Expects name to be a string');
+      }
+
+      validateOptions(options);
+      instance.register(name, options);
+    }
+
+    function remove(componentId) {
+      return instance.remove(componentId);
+    }
+
+    function removeAll() {
+      instance.removeAll();
+    }
+
+
+    function add(options, locals) {
+      locals = locals || {};
+      // assume if options is a string then they are calling a registered card by its component id
+      if (typeof options === 'string') {
+        // call add panel with the stored options
+        return add(instance.getRegistered(options), locals);
+      }
+
+      validateOptions(options);
+      if (options.componentId && instance.isPanelActive(options.componentId)) {
+        return $q.reject('panel with componentId "' + options.componentId + '" is currently active');
+      }
+
+
+      var deffered = $q.defer();
+      var scope = $rootScope.$new();
+      angular.extend(scope, options.scope);
+
+      getTemplate(options, function (template) {
+        var element = angular.element(template);
+        var componentId = options.componentId || element.attr('md-component-id') || '_panelComponentId_' + $mdUtil.nextUid();
+        var panelPromise = $mdExpansionPanel(componentId);
+        element.attr('md-component-id', componentId);
+
+        var linkFunc = $compile(element);
+        if (options.controller) {
+          angular.extend(locals, options.locals || {});
+          locals.$scope = scope;
+          locals.$panel = panelPromise;
+          var invokeCtrl = $controller(options.controller, locals, true);
+          var ctrl = invokeCtrl();
+          element.data('$ngControllerController', ctrl);
+          element.children().data('$ngControllerController', ctrl);
+          if (options.controllerAs) {
+            scope[options.controllerAs] = ctrl;
+          }
+        }
+
+        // link after the element is added so we can find card manager directive
+        instance.$element.append(element);
+        linkFunc(scope);
+
+        panelPromise.then(function (instance) {
+          deffered.resolve(instance);
+        });
+      });
+
+      return deffered.promise;
+    }
+
+
+    function validateOptions(options) {
+      if (typeof options !== 'object' || options === null) {
+        throw Error('$mdExapnsionPanelGroup.add()/.register() : Requires an options object to be passed in');
+      }
+
+      // if none of these exist then a dialog box cannot be created
+      if (!options.template && !options.templateUrl) {
+        throw Error('$mdExapnsionPanelGroup.add()/.register() : Is missing required paramters to create. Required One of the following: template, templateUrl');
+      }
+    }
+
+
+
+    function getTemplate(options, callback) {
+      var template;
+
+      if (options.templateUrl !== undefined) {
+        $templateRequest(options.templateUrl)
+          .then(function(response) {
+            callback(response);
+          });
+      } else {
+        callback(options.template);
+      }
+    }
+  };
+}
+}());
+(function(){"use strict";angular
+  .module('material.components.expansionPanels')
   .directive('mdExpansionPanelHeader', expansionPanelHeaderDirective);
 
 
@@ -607,11 +913,13 @@ function expansionPanelHeaderDirective() {
 
     function onScroll(top) {
       var bounds = element[0].getBoundingClientRect();
-      
+      var panelbottom = element[0].parentNode.getBoundingClientRect().bottom;
+      var offset = Math.max((top + bounds.height) - panelbottom, 0);
+
       if (bounds.top < top) {
         // set container width because element becomes postion fixed
         container.css('width', element[0].offsetWidth + 'px');
-        container.css('top', top + 'px');
+        container.css('top', (top - offset) + 'px');
 
         // set element height so it does not shink when container is position fixed
         element.css('height', container[0].offsetHeight + 'px');
