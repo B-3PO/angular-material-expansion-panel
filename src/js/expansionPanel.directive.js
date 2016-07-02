@@ -2,6 +2,10 @@ angular
   .module('material.components.expansionPanels')
   .directive('mdExpansionPanel', expansionPanelDirective);
 
+
+var ANIMATION_TIME = 180; //ms
+
+
 /**
  * @ngdoc directive
  * @name mdExpansionPanel
@@ -20,7 +24,7 @@ function expansionPanelDirective() {
     require: ['mdExpansionPanel', '?^^mdExpansionPanelGroup'],
     scope: true,
     compile: compile,
-    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', controller]
+    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', controller]
   };
   return directive;
 
@@ -42,16 +46,22 @@ function expansionPanelDirective() {
     return function postLink(scope, element, attrs, ctrls) {
       var epxansionPanelCtrl = ctrls[0];
       var epxansionPanelGroupCtrl = ctrls[1];
-      var componentId = attrs.mdComponentId;
 
-      epxansionPanelCtrl.componentId = componentId;
+      if (epxansionPanelGroupCtrl) {
+        epxansionPanelCtrl.epxansionPanelGroupCtrl = epxansionPanelGroupCtrl;
+        epxansionPanelGroupCtrl.addPanel(epxansionPanelCtrl.componentId, {
+          expand: epxansionPanelCtrl.expand,
+          collapse: epxansionPanelCtrl.collapse,
+          remove: epxansionPanelCtrl.remove
+        });
+      }
     };
   }
 
 
 
 
-  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry) {
+  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q) {
     /* jshint validthis: true */
     var vm = this;
 
@@ -75,8 +85,10 @@ function expansionPanelDirective() {
     vm.registerFooter = function (ctrl) { footerCtrl = ctrl; };
 
     vm.$element = $element;
+    vm.componentId = $attrs.mdComponentId;
     vm.expand = expand;
     vm.collapse = collapse;
+    vm.remove = remove;
 
     $attrs.$observe('disabled', function(disabled) {
       isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
@@ -111,20 +123,24 @@ function expansionPanelDirective() {
 
     $scope.$panel = {
       collapse: collapse,
-      expand: expand
+      expand: expand,
+      remove: remove
     };
 
 
     $scope.$on('$destroy', function () {
       // remove component from registry
       if (typeof deregister === 'function') { deregister(); }
+      killEvents();
     });
 
 
     if ($attrs.mdComponentId) {
       deregister = $mdComponentRegistry.register({
         expand: expand,
-        collapse: collapse
+        collapse: collapse,
+        remove: remove,
+        componentId: $attrs.mdComponentId
       }, $attrs.mdComponentId);
     }
 
@@ -133,6 +149,12 @@ function expansionPanelDirective() {
     function expand() {
       if (isOpen === true || isDisabled === true) { return; }
       isOpen = true;
+
+      var deferred = $q.defer();
+
+      if (vm.epxansionPanelGroupCtrl) {
+        vm.epxansionPanelGroupCtrl.expandPanel(vm.componentId);
+      }
 
       $element.removeClass('md-close');
       $element.addClass('md-open');
@@ -143,12 +165,19 @@ function expansionPanelDirective() {
 
       if (headerCtrl) { headerCtrl.show(); }
       if (footerCtrl) { footerCtrl.show(); }
+
+      $timeout(function () {
+        deferred.resolve();
+      }, ANIMATION_TIME);
+      return deferred.promise;
     }
 
 
     function collapse() {
       if (isOpen === false) { return; }
       isOpen = false;
+
+      var deferred = $q.defer();
 
       $element.addClass('md-close');
       $element.removeClass('md-open');
@@ -159,6 +188,35 @@ function expansionPanelDirective() {
 
       if (headerCtrl) { headerCtrl.hide(); }
       if (footerCtrl) { footerCtrl.hide(); }
+
+      $timeout(function () {
+        deferred.resolve();
+      }, ANIMATION_TIME);
+      return deferred.promise;
+    }
+
+
+    function remove(noAnimation) {
+      var deferred = $q.defer();
+
+      if (vm.epxansionPanelGroupCtrl) {
+        vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
+      }
+
+      if (noAnimation === true || isOpen === false) {
+        $scope.$destroy();
+        $element.remove();
+        deferred.resolve();
+      } else {
+        collapse();
+        $timeout(function () {
+          $scope.$destroy();
+          $element.remove();
+          deferred.resolve();
+        }, ANIMATION_TIME);
+      }
+
+      return deferred.promise;
     }
 
 
@@ -203,7 +261,7 @@ function expansionPanelDirective() {
         resizeKiller = undefined;
       }
 
-      if (scrollContainer.nodeName === 'MD-CONTENT') {
+      if (scrollContainer && scrollContainer.nodeName === 'MD-CONTENT') {
         angular.element(scrollContainer).off('scroll', debouncedUpdateScroll);
       }
 
