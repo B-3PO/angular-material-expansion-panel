@@ -174,5 +174,5 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
         callback(options.template);
       }
     }
-  };
+  }
 }

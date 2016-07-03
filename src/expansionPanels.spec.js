@@ -60,10 +60,16 @@ describe('material.components.expansionPanels', function () {
   // --- Expansion Panel Service ---
 
   describe('$mdExpansionPanel Service', function () {
-    it('should find instance by id', inject(function($mdExpansionPanel) {
+    it('should find instance by id with sync method', inject(function($mdExpansionPanel) {
+      var element = getDirective({componentId: 'expansionPanelId'});
+      var instance = $mdExpansionPanel('expansionPanelId');
+      expect(instance).toBeDefined();
+    }));
+
+    it('should find instance by id with async method', inject(function($mdExpansionPanel) {
       var instance;
 
-      $mdExpansionPanel('expansionPanelId').then(function(inst) {
+      $mdExpansionPanel().waitFor('expansionPanelId').then(function(inst) {
         instance = inst;
       });
       expect(instance).toBeUndefined();
@@ -76,35 +82,26 @@ describe('material.components.expansionPanels', function () {
 
 
     it('should expand panel', inject(function($mdExpansionPanel) {
-      $mdExpansionPanel('expansionPanelId').then(function(instance) {
-        instance.expand();
-      });
-
       var element = getDirective({componentId: 'expansionPanelId'});
+      $mdExpansionPanel('expansionPanelId').expand();
       flushAnimations();
 
       expect(element.hasClass('md-open')).toBe(true);
     }));
 
 
-    it('should expand panel', inject(function($mdExpansionPanel) {
-      $mdExpansionPanel('expansionPanelId').then(function(instance) {
-        instance.expand();
-        instance.collapse();
-      });
-
+    it('should collapse panel', inject(function($mdExpansionPanel) {
       var element = getDirective({componentId: 'expansionPanelId'});
+      $mdExpansionPanel('expansionPanelId').expand();
+      $mdExpansionPanel('expansionPanelId').collapse();
       flushAnimations();
 
       expect(element.hasClass('md-close')).toBe(true);
     }));
 
     it('should remove panel', inject(function($mdExpansionPanel) {
-      $mdExpansionPanel('expansionPanelId').then(function(instance) {
-        instance.remove();
-      });
-
       var element = getDirective({componentId: 'expansionPanelId'});
+      $mdExpansionPanel('expansionPanelId').remove();
       expect(element.scope()).toBeUndefined();
     }));
 
@@ -118,11 +115,17 @@ describe('material.components.expansionPanels', function () {
   // --- Expansion Panel Group Service ---
 
   describe('$mdExpansionPanelGroup Service', function () {
+    it('should find instance by id using sync method', inject(function($mdExpansionPanelGroup) {
+      var element = getGroupDirective();
+      var instance = $mdExpansionPanelGroup('expansionPanelGroupId');
+      expect(instance).toBeDefined();
+    }));
 
-    it('should find instance by id', inject(function($mdExpansionPanelGroup) {
+
+    it('should find instance by id usign async method', inject(function($mdExpansionPanelGroup) {
       var instance;
 
-      $mdExpansionPanelGroup('expansionPanelGroupId').then(function(inst) {
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
         instance = inst;
       });
       expect(instance).toBeUndefined();
@@ -138,7 +141,7 @@ describe('material.components.expansionPanels', function () {
       var instance;
       var panelInstance;
 
-      $mdExpansionPanelGroup('expansionPanelGroupId').then(function(inst) {
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
         instance = inst;
         inst.register('panelName', {
           template: getTemplate(),
@@ -160,7 +163,7 @@ describe('material.components.expansionPanels', function () {
     it('should remove added panel', inject(function($mdExpansionPanelGroup) {
       var instance;
 
-      $mdExpansionPanelGroup('expansionPanelGroupId').then(function(inst) {
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
         instance = inst;
         inst.add({
           template: getTemplate({componentId: 'expansionPanelId'}),
@@ -180,7 +183,7 @@ describe('material.components.expansionPanels', function () {
     it('should remove all panels', inject(function($mdExpansionPanelGroup) {
       var instance;
 
-      $mdExpansionPanelGroup('expansionPanelGroupId').then(function(inst) {
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
         instance = inst;
         inst.add({
           template: getTemplate({componentId: 'expansionPanelOne'}),
