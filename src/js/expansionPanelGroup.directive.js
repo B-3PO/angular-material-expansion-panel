@@ -28,13 +28,14 @@ function expansionPanelGroupDirective() {
     /* jshint validthis: true */
     var vm = this;
 
+    var deregister;
     var registered = {};
     var panels = {};
     var multipleExpand = $attrs.mdMultiple !== undefined || $attrs.multiple !== undefined;
     var autoExpand = $attrs.mdAutoExpand !== undefined || $attrs.autoExpand !== undefined;
 
 
-    vm.destroy = $mdComponentRegistry.register({
+    deregister = $mdComponentRegistry.register({
       $element: $element,
       register: register,
       getRegistered: getRegistered,
@@ -48,7 +49,16 @@ function expansionPanelGroupDirective() {
 
 
     $scope.$on('$destroy', function () {
-      if (typeof vm.destroy === 'function') { vm.destroy(); }
+      if (typeof deregister === 'function') {
+        deregister();
+        deregister = undefined;
+      }
+
+      // destroy all panels
+      // for some reason the child panels scopes are not getting destroyed
+      Object.keys(panels).forEach(function (key) {
+        panels[key].destroy();
+      });
     });
 
 

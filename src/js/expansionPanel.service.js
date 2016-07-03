@@ -15,15 +15,37 @@ angular
  * $mdExpansionPanel('comonentId').then(function (instance) {
  *  instance.exapand();
  *  instance.collapse();
+ *  instance.remove();
  * });
  */
-expansionPanelService.$inject = ['$mdComponentRegistry'];
-function expansionPanelService($mdComponentRegistry) {
-  return function (handle) {
-    return $mdComponentRegistry
-        .when(handle)
-        .then(function (instance) {
-          return instance;
-        });
+expansionPanelService.$inject = ['$mdComponentRegistry', '$mdUtil', '$log'];
+function expansionPanelService($mdComponentRegistry, $mdUtil, $log) {
+  var errorMsg = "ExpansionPanel '{0}' is not available! Did you use md-component-id='{0}'?";
+  var service = {
+    find: findInstance,
+    waitFor: waitForInstance
   };
+
+  return function (handle) {
+    if (handle === undefined) { return service; }
+    return findInstance(handle);
+  };
+
+
+
+  function findInstance(handle) {
+    var instance = $mdComponentRegistry.get(handle);
+
+    if (!instance) {
+      // Report missing instance
+      $log.error( $mdUtil.supplant(errorMsg, [handle || ""]) );
+      return undefined;
+    }
+
+    return instance;
+  }
+
+  function waitForInstance(handle) {
+    return $mdComponentRegistry.when(handle).catch($log.error);
+  }
 }

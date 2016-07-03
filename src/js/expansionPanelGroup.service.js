@@ -23,10 +23,53 @@ angular
  *  instance.removeAll();
  * });
  */
-expansionPanelGroupService.$inject = ['$mdComponentRegistry', '$mdUtil', '$mdExpansionPanel', '$templateRequest', '$rootScope', '$compile', '$controller', '$q'];
-function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionPanel, $templateRequest, $rootScope, $compile, $controller, $q) {
+expansionPanelGroupService.$inject = ['$mdComponentRegistry', '$mdUtil', '$mdExpansionPanel', '$templateRequest', '$rootScope', '$compile', '$controller', '$q', '$log'];
+function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionPanel, $templateRequest, $rootScope, $compile, $controller, $q, $log) {
+  var errorMsg = "ExpansionPanelGroup '{0}' is not available! Did you use md-component-id='{0}'?";
+  var service = {
+    find: findInstance,
+    waitFor: waitForInstance
+  };
+
   return function (handle) {
-    var instance;
+    if (handle === undefined) { return service; }
+    return findInstance(handle);
+  };
+
+
+
+  function findInstance(handle) {
+    var instance = $mdComponentRegistry.get(handle);
+
+    if (!instance) {
+      // Report missing instance
+      $log.error( $mdUtil.supplant(errorMsg, [handle || ""]) );
+      return undefined;
+    }
+
+    return createGroupInstance(instance);
+  }
+
+  function waitForInstance(handle) {
+    var deffered = $q.defer();
+
+    $mdComponentRegistry.when(handle).then(function (instance) {
+      deffered.resolve(createGroupInstance(instance));
+    }).catch(function (error) {
+      deffered.reject();
+      $log.error(error);
+    });
+
+    return deffered.promise;
+  }
+
+
+
+
+
+  // --- returned service for group instance ---
+
+  function createGroupInstance(instance) {
     var service = {
       add: add,
       register: register,
@@ -34,13 +77,7 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
       removeAll: removeAll
     };
 
-    return $mdComponentRegistry
-        .when(handle)
-        .then(function (it) {
-          instance = it;
-          return service;
-        });
-
+    return service;
 
 
     function register(name, options) {
@@ -82,7 +119,7 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
       getTemplate(options, function (template) {
         var element = angular.element(template);
         var componentId = options.componentId || element.attr('md-component-id') || '_panelComponentId_' + $mdUtil.nextUid();
-        var panelPromise = $mdExpansionPanel(componentId);
+        var panelPromise = $mdExpansionPanel().waitFor(componentId);
         element.attr('md-component-id', componentId);
 
         var linkFunc = $compile(element);

@@ -52,7 +52,8 @@ function expansionPanelDirective() {
         epxansionPanelGroupCtrl.addPanel(epxansionPanelCtrl.componentId, {
           expand: epxansionPanelCtrl.expand,
           collapse: epxansionPanelCtrl.collapse,
-          remove: epxansionPanelCtrl.remove
+          remove: epxansionPanelCtrl.remove,
+          destroy: epxansionPanelCtrl.destroy,
         });
       }
     };
@@ -89,6 +90,7 @@ function expansionPanelDirective() {
     vm.expand = expand;
     vm.collapse = collapse;
     vm.remove = remove;
+    vm.destroy = destroy;
 
     $attrs.$observe('disabled', function(disabled) {
       isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
@@ -127,10 +129,12 @@ function expansionPanelDirective() {
       remove: remove
     };
 
-
     $scope.$on('$destroy', function () {
       // remove component from registry
-      if (typeof deregister === 'function') { deregister(); }
+      if (typeof deregister === 'function') {
+        deregister();
+        deregister = undefined;
+      }
       killEvents();
     });
 
@@ -203,6 +207,11 @@ function expansionPanelDirective() {
         vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
       }
 
+      if (typeof deregister === 'function') {
+        deregister();
+        deregister = undefined;
+      }
+
       if (noAnimation === true || isOpen === false) {
         $scope.$destroy();
         $element.remove();
@@ -217,6 +226,10 @@ function expansionPanelDirective() {
       }
 
       return deferred.promise;
+    }
+
+    function destroy() {
+      $scope.$destroy();
     }
 
 
