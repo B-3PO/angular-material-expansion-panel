@@ -64,7 +64,8 @@ function expansionPanelDirective() {
         epxansionPanelGroupCtrl.addPanel(epxansionPanelCtrl.componentId, {
           expand: epxansionPanelCtrl.expand,
           collapse: epxansionPanelCtrl.collapse,
-          remove: epxansionPanelCtrl.remove
+          remove: epxansionPanelCtrl.remove,
+          destroy: epxansionPanelCtrl.destroy,
         });
       }
     };
@@ -101,6 +102,7 @@ function expansionPanelDirective() {
     vm.expand = expand;
     vm.collapse = collapse;
     vm.remove = remove;
+    vm.destroy = destroy;
 
     $attrs.$observe('disabled', function(disabled) {
       isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
@@ -139,10 +141,12 @@ function expansionPanelDirective() {
       remove: remove
     };
 
-
     $scope.$on('$destroy', function () {
       // remove component from registry
-      if (typeof deregister === 'function') { deregister(); }
+      if (typeof deregister === 'function') {
+        deregister();
+        deregister = undefined;
+      }
       killEvents();
     });
 
@@ -215,6 +219,11 @@ function expansionPanelDirective() {
         vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
       }
 
+      if (typeof deregister === 'function') {
+        deregister();
+        deregister = undefined;
+      }
+
       if (noAnimation === true || isOpen === false) {
         $scope.$destroy();
         $element.remove();
@@ -229,6 +238,10 @@ function expansionPanelDirective() {
       }
 
       return deferred.promise;
+    }
+
+    function destroy() {
+      $scope.$destroy();
     }
 
 
@@ -330,17 +343,39 @@ function expansionPanelDirective() {
  * $mdExpansionPanel('comonentId').then(function (instance) {
  *  instance.exapand();
  *  instance.collapse();
+ *  instance.remove();
  * });
  */
-expansionPanelService.$inject = ['$mdComponentRegistry'];
-function expansionPanelService($mdComponentRegistry) {
-  return function (handle) {
-    return $mdComponentRegistry
-        .when(handle)
-        .then(function (instance) {
-          return instance;
-        });
+expansionPanelService.$inject = ['$mdComponentRegistry', '$mdUtil', '$log'];
+function expansionPanelService($mdComponentRegistry, $mdUtil, $log) {
+  var errorMsg = "ExpansionPanel '{0}' is not available! Did you use md-component-id='{0}'?";
+  var service = {
+    find: findInstance,
+    waitFor: waitForInstance
   };
+
+  return function (handle) {
+    if (handle === undefined) { return service; }
+    return findInstance(handle);
+  };
+
+
+
+  function findInstance(handle) {
+    var instance = $mdComponentRegistry.get(handle);
+
+    if (!instance) {
+      // Report missing instance
+      $log.error( $mdUtil.supplant(errorMsg, [handle || ""]) );
+      return undefined;
+    }
+
+    return instance;
+  }
+
+  function waitForInstance(handle) {
+    return $mdComponentRegistry.when(handle).catch($log.error);
+  }
 }
 }());
 (function(){"use strict";angular
@@ -639,13 +674,14 @@ function expansionPanelGroupDirective() {
     /* jshint validthis: true */
     var vm = this;
 
+    var deregister;
     var registered = {};
     var panels = {};
     var multipleExpand = $attrs.mdMultiple !== undefined || $attrs.multiple !== undefined;
     var autoExpand = $attrs.mdAutoExpand !== undefined || $attrs.autoExpand !== undefined;
 
 
-    vm.destroy = $mdComponentRegistry.register({
+    deregister = $mdComponentRegistry.register({
       $element: $element,
       register: register,
       getRegistered: getRegistered,
@@ -659,7 +695,16 @@ function expansionPanelGroupDirective() {
 
 
     $scope.$on('$destroy', function () {
-      if (typeof vm.destroy === 'function') { vm.destroy(); }
+      if (typeof deregister === 'function') {
+        deregister();
+        deregister = undefined;
+      }
+
+      // destroy all panels
+      // for some reason the child panels scopes are not getting destroyed
+      Object.keys(panels).forEach(function (key) {
+        panels[key].destroy();
+      });
     });
 
 
@@ -740,10 +785,53 @@ function expansionPanelGroupDirective() {
  *  instance.removeAll();
  * });
  */
-expansionPanelGroupService.$inject = ['$mdComponentRegistry', '$mdUtil', '$mdExpansionPanel', '$templateRequest', '$rootScope', '$compile', '$controller', '$q'];
-function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionPanel, $templateRequest, $rootScope, $compile, $controller, $q) {
+expansionPanelGroupService.$inject = ['$mdComponentRegistry', '$mdUtil', '$mdExpansionPanel', '$templateRequest', '$rootScope', '$compile', '$controller', '$q', '$log'];
+function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionPanel, $templateRequest, $rootScope, $compile, $controller, $q, $log) {
+  var errorMsg = "ExpansionPanelGroup '{0}' is not available! Did you use md-component-id='{0}'?";
+  var service = {
+    find: findInstance,
+    waitFor: waitForInstance
+  };
+
   return function (handle) {
-    var instance;
+    if (handle === undefined) { return service; }
+    return findInstance(handle);
+  };
+
+
+
+  function findInstance(handle) {
+    var instance = $mdComponentRegistry.get(handle);
+
+    if (!instance) {
+      // Report missing instance
+      $log.error( $mdUtil.supplant(errorMsg, [handle || ""]) );
+      return undefined;
+    }
+
+    return createGroupInstance(instance);
+  }
+
+  function waitForInstance(handle) {
+    var deffered = $q.defer();
+
+    $mdComponentRegistry.when(handle).then(function (instance) {
+      deffered.resolve(createGroupInstance(instance));
+    }).catch(function (error) {
+      deffered.reject();
+      $log.error(error);
+    });
+
+    return deffered.promise;
+  }
+
+
+
+
+
+  // --- returned service for group instance ---
+
+  function createGroupInstance(instance) {
     var service = {
       add: add,
       register: register,
@@ -751,13 +839,7 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
       removeAll: removeAll
     };
 
-    return $mdComponentRegistry
-        .when(handle)
-        .then(function (it) {
-          instance = it;
-          return service;
-        });
-
+    return service;
 
 
     function register(name, options) {
@@ -799,7 +881,7 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
       getTemplate(options, function (template) {
         var element = angular.element(template);
         var componentId = options.componentId || element.attr('md-component-id') || '_panelComponentId_' + $mdUtil.nextUid();
-        var panelPromise = $mdExpansionPanel(componentId);
+        var panelPromise = $mdExpansionPanel().waitFor(componentId);
         element.attr('md-component-id', componentId);
 
         var linkFunc = $compile(element);
@@ -854,7 +936,7 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
         callback(options.template);
       }
     }
-  };
+  }
 }
 }());
 (function(){"use strict";angular
