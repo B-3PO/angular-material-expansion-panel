@@ -4,14 +4,12 @@ angular
 
 
 function HomeController($scope, $mdExpansionPanel) {
-  $mdExpansionPanel('expansionPanelOne').then(function (instance) {
+  $mdExpansionPanel().waitFor('expansionPanelOne').then(function (instance) {
     instance.expand();
   });
 
 
   $scope.collapseOne = function () {
-    $mdExpansionPanel('expansionPanelOne').then(function (instance) {
-      instance.collapse();
-    });
+    $mdExpansionPanel('expansionPanelOne').collapse();
   };
 }
