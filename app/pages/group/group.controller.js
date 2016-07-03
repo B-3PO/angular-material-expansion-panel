@@ -16,7 +16,7 @@ function GroupController($mdExpansionPanelGroup) {
 
   vm.addTemplated = addTemplated;
 
-  $mdExpansionPanelGroup('expansionPanelGroup').then(function (instance) {
+  $mdExpansionPanelGroup().waitFor('expansionPanelGroup').then(function (instance) {
     groupInstance = instance;
 
     instance.register('templated', {

@@ -286,7 +286,13 @@ this is optional
 Expand and collapse Expansion Panel using its `md-component-id`
 
 ```javascript
-$mdExpansionPanel('theComponentId').then(function (instance) {
+// sync
+$mdExpansionPanel('theComponentId').expand();
+$mdExpansionPanel('theComponentId').contract();
+$mdExpansionPanel('theComponentId').remove();
+
+// Async
+$mdExpansionPanel().waitFor('theComponentId').then(function (instance) {
   instance.expand();
   instance.contract();
   instance.remove();
@@ -298,18 +304,30 @@ $mdExpansionPanel('theComponentId').then(function (instance) {
 ### $mdExpansionPanel
 
 Get an instance of the expansion panel by its component id
+You can use this in 2 ways
+
+- 1. pass in a string id and get back the instance
+- 2. call the service and get a service with 2 methods. `Find` witch will do the same as 1. `waitFor` that will return a promise, so you can call on directives before they are added to the dom.
 
 **Parameters**
 
 | Param | Type | Details |
 | :--: | :--: | :--: |
-| componentId | string | <p>the component id used on the element</p>  |
+| componentId | string= | <p>the component id used on the element</p>  |
 
 **Returns**
 
 | Param | Details |
 | :--: | :--: |
-| promise | <p>a promise that will resolve with the panel instance</p>  |
+| promise/instance | <p>returns a instance or a service with 2 methods</p>  |
+
+
+**Returned Service**
+
+| Method | Details |
+| :--: | :--: |
+| find | <p>sync method for getting instance</p>  |
+| waitFor | <p>async method for getting instance. this returnes a promise</p>  |
 
 
 ### $mdExpansionPanel#expand
@@ -360,7 +378,23 @@ Remove panel from document
 Control expansion panels and allow for adding and registering panels from code
 
 ```javascript
-$mdExpansionPanelGroup('theComponentId').then(function (instance) {
+// sync
+$mdExpansionPanelGroup('theComponentId').register('name', {
+  templateUrl: 'template.html',
+  controller: 'Controller'
+});
+$mdExpansionPanelGroup('theComponentId').add({
+  templateUrl: 'template.html',
+  controller: 'Controller'
+}).then(function (panelCtrl) {
+  panelCtrl.expand();
+});
+$mdExpansionPanelGroup('theComponentId').remove('name');
+$mdExpansionPanelGroup('theComponentId').removeAll();
+
+
+// async
+$mdExpansionPanelGroup().waitFor('theComponentId').then(function (instance) {
   instance.register('name', {
     templateUrl: 'template.html',
     controller: 'Controller'
@@ -385,19 +419,31 @@ $mdExpansionPanelGroup('theComponentId').then(function (instance) {
 
 ### $mdExpansionPanelGroup
 
-Get an instance of the expansion panel group by its component id
+Get an instance of the expansion panel group by its component id.
+You can use this in 2 ways
+
+- 1. pass in a string id and get back the instance
+- 2. call the service and get a service with 2 methods. `Find` witch will do the same as 1. `waitFor` that will return a promise, so you can call on directives before they are added to the dom.
 
 **Parameters**
 
 | Param | Type | Details |
 | :--: | :--: | :--: |
-| componentId | string | <p>the component id used on the element</p>  |
+| componentId | string= | <p>the component id used on the element</p>  |
 
 **Returns**
 
 | Param | Details |
 | :--: | :--: |
-| promise | <p>a promise that will resolve with the panel group instance</p>  |
+| promise/instance | <p>returns a instance or a service with 2 methods</p>  |
+
+
+**Returned Service**
+
+| Method | Details |
+| :--: | :--: |
+| find | <p>sync method for getting instance</p>  |
+| waitFor | <p>async method for getting instance. this returnes a promise</p>  |
 
 
 ### $mdExpansionPanelGroup#register
@@ -424,7 +470,7 @@ add a panel by either passing in a registered name or object. You can also pass 
 
 | Param | Type | Details |
 | :--: | :--: | :--: |
-| options | string|object | <p>registered panel name or object with details</p>  |
+| options | string/object | <p>registered panel name or object with details</p>  |
 | locals | object= | <p>object of locals to inject intp controller</p>  |
 
 **Options Object**
