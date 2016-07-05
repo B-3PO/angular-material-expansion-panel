@@ -3,8 +3,8 @@
   "version": "0.4.0",
   "description": "Material Design Expansion Panels.",
   "main": [
-    "dist/md-expansion-panels.js",
-    "dist/md-expansion-panels.css"
+    "dist/md-expansion-panel.js",
+    "dist/md-expansion-panel.css"
   ],
   "repository": {
     "type": "git",
