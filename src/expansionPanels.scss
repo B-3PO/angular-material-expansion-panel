@@ -1,3 +1,7 @@
+.layout-padding > md-expansion-panel-group {
+  padding: 0;
+}
+
 /* --- Expansion Panel --- */
 
 md-expansion-panel {
@@ -100,7 +104,6 @@ md-expansion-panel-collapsed {
 md-expansion-panel-expanded {
   display: none;
   min-height: 48px;
-  line-height: 48px;
 
 
   &.md-show {

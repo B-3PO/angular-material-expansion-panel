@@ -32,6 +32,15 @@ function GroupController($mdExpansionPanelGroup) {
     }).then(function (panelInstance) {
       panelInstance.expand();
     });
+
+    var change = instance.onChange(function (count) {
+      console.log('panel count', count);
+    });
+
+
+    setTimeout(function () {
+      change();
+    }, 10000)
   });
 
   function addTemplated() {

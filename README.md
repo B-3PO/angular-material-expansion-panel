@@ -510,3 +510,32 @@ Remove a panel form the group
 ### $mdExpansionPanelGroup#removeAll
 
 Remove all panels form the group
+
+
+### $mdExpansionPanelGroup#count
+
+Return number of panels
+
+**Returns**
+
+| Type | Details |
+| :--: | :--: |
+| number | <p>number of panels in dom</p>  |
+
+
+
+### $mdExpansionPanelGroup#onChange
+
+A function that is called whenever a panel is added or removed from dom. This will return the panel count
+
+**Parameters**
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| callback | function | <p></p>  |
+
+**Returns**
+
+| Type | Details |
+| :--: | :--: |
+| function | <p>a function you can call to stop listening</p>  |

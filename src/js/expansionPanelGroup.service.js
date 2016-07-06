@@ -74,7 +74,9 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
       add: add,
       register: register,
       remove: remove,
-      removeAll: removeAll
+      removeAll: removeAll,
+      onChange: onChange,
+      count: count
     };
 
     return service;
@@ -95,6 +97,14 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
 
     function removeAll() {
       instance.removeAll();
+    }
+
+    function onChange(callback) {
+      return instance.onChange(callback);
+    }
+
+    function count() {
+      return instance.count();
     }
 
 

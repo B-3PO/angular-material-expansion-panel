@@ -31,6 +31,7 @@ function expansionPanelGroupDirective() {
     var deregister;
     var registered = {};
     var panels = {};
+    var onChangeFuncs = [];
     var multipleExpand = $attrs.mdMultiple !== undefined || $attrs.multiple !== undefined;
     var autoExpand = $attrs.mdAutoExpand !== undefined || $attrs.autoExpand !== undefined;
 
@@ -40,7 +41,9 @@ function expansionPanelGroupDirective() {
       register: register,
       getRegistered: getRegistered,
       remove: remove,
-      removeAll: removeAll
+      removeAll: removeAll,
+      onChange: onChange,
+      count: panelCount
     }, $attrs.mdComponentId);
 
     vm.addPanel = addPanel;
@@ -62,12 +65,30 @@ function expansionPanelGroupDirective() {
     });
 
 
+
+    function onChange(callback) {
+      onChangeFuncs.push(callback);
+
+      return function () {
+        onChangeFuncs.splice(onChangeFuncs.indexOf(callback), 1);
+      };
+    }
+
+    function callOnChange() {
+      var count = panelCount();
+      onChangeFuncs.forEach(function (func) {
+        func(count);
+      });
+    }
+
+
     function addPanel(componentId, panelCtrl) {
       panels[componentId] = panelCtrl;
       if (autoExpand === true) {
         panelCtrl.expand();
         closeOthers(componentId);
       }
+      callOnChange();
     }
 
     function expandPanel(componentId) {
@@ -86,6 +107,11 @@ function expansionPanelGroupDirective() {
 
     function removePanel(componentId) {
       delete panels[componentId];
+      callOnChange();
+    }
+
+    function panelCount() {
+      return Object.keys(panels).length;
     }
 
     function closeOthers(id) {
