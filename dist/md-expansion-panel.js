@@ -65,6 +65,7 @@ function expansionPanelDirective() {
           expand: epxansionPanelCtrl.expand,
           collapse: epxansionPanelCtrl.collapse,
           remove: epxansionPanelCtrl.remove,
+          onRemove: epxansionPanelCtrl.onRemove,
           destroy: epxansionPanelCtrl.destroy,
         });
       }
@@ -87,6 +88,7 @@ function expansionPanelDirective() {
     var stickyContainer;
     var topKiller;
     var resizeKiller;
+    var onRemoveCallback;
     var isOpen = false;
     var isDisabled = false;
     var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
@@ -103,6 +105,7 @@ function expansionPanelDirective() {
     vm.collapse = collapse;
     vm.remove = remove;
     vm.destroy = destroy;
+    vm.onRemove = onRemove;
 
     $attrs.$observe('disabled', function(disabled) {
       isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
@@ -156,6 +159,7 @@ function expansionPanelDirective() {
         expand: expand,
         collapse: collapse,
         remove: remove,
+        onRemove: onRemove,
         componentId: $attrs.mdComponentId
       }, $attrs.mdComponentId);
     }
@@ -228,16 +232,29 @@ function expansionPanelDirective() {
         $scope.$destroy();
         $element.remove();
         deferred.resolve();
+        callbackRemove();
       } else {
         collapse();
         $timeout(function () {
           $scope.$destroy();
           $element.remove();
           deferred.resolve();
+          callbackRemove();
         }, ANIMATION_TIME);
       }
 
       return deferred.promise;
+    }
+
+    function onRemove(callback) {
+      onRemoveCallback = callback;
+    }
+
+    function callbackRemove() {
+      if (typeof onRemoveCallback === 'function') {
+        onRemoveCallback();
+        onRemoveCallback = undefined;
+      }
     }
 
     function destroy() {
@@ -344,6 +361,7 @@ function expansionPanelDirective() {
  *  instance.exapand();
  *  instance.collapse();
  *  instance.remove();
+ *  instance.onRemove(function () {});
  * });
  */
 expansionPanelService.$inject = ['$mdComponentRegistry', '$mdUtil', '$log'];
@@ -741,13 +759,13 @@ function expansionPanelGroupDirective() {
       closeOthers(componentId);
     }
 
-    function remove(componentId) {
-      return panels[componentId].remove();
+    function remove(componentId, noAnimation) {
+      return panels[componentId].remove(noAnimation);
     }
 
-    function removeAll() {
+    function removeAll(noAnimation) {
       Object.keys(panels).forEach(function (panelId) {
-        panels[panelId].remove();
+        panels[panelId].remove(noAnimation);
       });
     }
 
@@ -883,8 +901,8 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
       return instance.remove(componentId);
     }
 
-    function removeAll() {
-      instance.removeAll();
+    function removeAll(noAnimation) {
+      instance.removeAll(noAnimation);
     }
 
     function onChange(callback) {
