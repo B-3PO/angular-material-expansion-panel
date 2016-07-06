@@ -53,6 +53,7 @@ function expansionPanelDirective() {
           expand: epxansionPanelCtrl.expand,
           collapse: epxansionPanelCtrl.collapse,
           remove: epxansionPanelCtrl.remove,
+          onRemove: epxansionPanelCtrl.onRemove,
           destroy: epxansionPanelCtrl.destroy,
         });
       }
@@ -75,6 +76,7 @@ function expansionPanelDirective() {
     var stickyContainer;
     var topKiller;
     var resizeKiller;
+    var onRemoveCallback;
     var isOpen = false;
     var isDisabled = false;
     var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
@@ -91,6 +93,7 @@ function expansionPanelDirective() {
     vm.collapse = collapse;
     vm.remove = remove;
     vm.destroy = destroy;
+    vm.onRemove = onRemove;
 
     $attrs.$observe('disabled', function(disabled) {
       isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
@@ -144,6 +147,7 @@ function expansionPanelDirective() {
         expand: expand,
         collapse: collapse,
         remove: remove,
+        onRemove: onRemove,
         componentId: $attrs.mdComponentId
       }, $attrs.mdComponentId);
     }
@@ -216,16 +220,29 @@ function expansionPanelDirective() {
         $scope.$destroy();
         $element.remove();
         deferred.resolve();
+        callbackRemove();
       } else {
         collapse();
         $timeout(function () {
           $scope.$destroy();
           $element.remove();
           deferred.resolve();
+          callbackRemove();
         }, ANIMATION_TIME);
       }
 
       return deferred.promise;
+    }
+
+    function onRemove(callback) {
+      onRemoveCallback = callback;
+    }
+
+    function callbackRemove() {
+      if (typeof onRemoveCallback === 'function') {
+        onRemoveCallback();
+        onRemoveCallback = undefined;
+      }
     }
 
     function destroy() {

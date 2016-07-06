@@ -290,12 +290,14 @@ Expand and collapse Expansion Panel using its `md-component-id`
 $mdExpansionPanel('theComponentId').expand();
 $mdExpansionPanel('theComponentId').contract();
 $mdExpansionPanel('theComponentId').remove();
+$mdExpansionPanel('theComponentId').onRemove(function () {});
 
 // Async
 $mdExpansionPanel().waitFor('theComponentId').then(function (instance) {
   instance.expand();
   instance.contract();
   instance.remove();
+  instance.onRemove(function () {});
 });
 ```
 
@@ -369,6 +371,17 @@ Remove panel from document
 | promise | <p>a promise that will resolve when panel is done animating</p>  |
 
 
+### $mdExpansionPanel#onRemove
+
+Callback for panel when removed from dom
+
+**Parameters**
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| callback | function | <p>function called when panel is removed from dom</p>  |
+
+
 
 
 
@@ -391,6 +404,8 @@ $mdExpansionPanelGroup('theComponentId').add({
 });
 $mdExpansionPanelGroup('theComponentId').remove('name');
 $mdExpansionPanelGroup('theComponentId').removeAll();
+$mdExpansionPanelGroup('theComponentId').count();
+var killOnChange = $mdExpansionPanelGroup('theComponentId').onChange(function (count) {});
 
 
 // async
@@ -410,6 +425,8 @@ $mdExpansionPanelGroup().waitFor('theComponentId').then(function (instance) {
   instance.add('name', {locals: 'data'});
   instance.remove('name');
   instance.removeAll();
+  instance.count();
+  var killOnChange = instance.onChange(function (count) {});
 });
 ```
 

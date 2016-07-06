@@ -95,8 +95,8 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
       return instance.remove(componentId);
     }
 
-    function removeAll() {
-      instance.removeAll();
+    function removeAll(noAnimation) {
+      instance.removeAll(noAnimation);
     }
 
     function onChange(callback) {

@@ -95,13 +95,13 @@ function expansionPanelGroupDirective() {
       closeOthers(componentId);
     }
 
-    function remove(componentId) {
-      return panels[componentId].remove();
+    function remove(componentId, noAnimation) {
+      return panels[componentId].remove(noAnimation);
     }
 
-    function removeAll() {
+    function removeAll(noAnimation) {
       Object.keys(panels).forEach(function (panelId) {
-        panels[panelId].remove();
+        panels[panelId].remove(noAnimation);
       });
     }
 

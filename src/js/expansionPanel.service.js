@@ -16,6 +16,7 @@ angular
  *  instance.exapand();
  *  instance.collapse();
  *  instance.remove();
+ *  instance.onRemove(function () {});
  * });
  */
 expansionPanelService.$inject = ['$mdComponentRegistry', '$mdUtil', '$log'];

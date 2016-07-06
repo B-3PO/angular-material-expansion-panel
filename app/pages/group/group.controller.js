@@ -49,9 +49,9 @@ function GroupController($mdExpansionPanelGroup) {
       summary: vm.summary,
       content: vm.content
     }).then(function (panel) {
-      // panel.expand().then(function () {
-      //   console.log('opened post animation');
-      // });
+      panel.onRemove(function () {
+        console.log('panel removed');
+      });
     });
   }
 }
