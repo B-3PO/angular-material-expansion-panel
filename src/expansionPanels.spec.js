@@ -105,6 +105,19 @@ describe('material.components.expansionPanels', function () {
       expect(element.scope()).toBeUndefined();
     }));
 
+
+    it('should call onRemove callabck', inject(function($mdExpansionPanel) {
+      var obj = {
+        callback: function () {}
+      };
+      spyOn(obj, 'callback');
+      var element = getDirective({componentId: 'expansionPanelId'});
+      $mdExpansionPanel('expansionPanelId').onRemove(obj.callback);
+      $mdExpansionPanel('expansionPanelId').remove();
+
+      expect(obj.callback).toHaveBeenCalled();
+    }));
+
   });
 
 
@@ -203,6 +216,67 @@ describe('material.components.expansionPanels', function () {
 
       expect(element[0].querySelector('[md-component-id="expansionPanelOne"]')).toBe(null);
       expect(element[0].querySelector('[md-component-id="expansionPanelTwo"]')).toBe(null);
+    }));
+
+
+
+    it('should call onChange callback', inject(function($mdExpansionPanelGroup) {
+      var obj = {
+        callback: function () {}
+      };
+      spyOn(obj, 'callback');
+
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
+        inst.onChange(obj.callback);
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelId'}),
+          controller: function () {}
+        });
+      });
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(obj.callback).toHaveBeenCalled();
+    }));
+
+    it('should not call onChange callback', inject(function($mdExpansionPanelGroup) {
+      var obj = {
+        callback: function () {}
+      };
+      spyOn(obj, 'callback');
+
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
+        var change = inst.onChange(obj.callback);
+        change();
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelId'}),
+          controller: function () {}
+        });
+      });
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(obj.callback).not.toHaveBeenCalled();
+    }));
+
+
+    it('should return count', inject(function($mdExpansionPanelGroup) {
+      var instance;
+
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
+        instance = inst;
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelId'}),
+          controller: function () {}
+        });
+      });
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(instance.count()).toBe(1);
     }));
 
   });
@@ -659,7 +733,7 @@ describe('material.components.expansionPanels', function () {
     [
       options.disabled ? 'disabled' : '',
       options.height ? ' height="'+options.height+'" ' : '',
-      options.content ? '<md-content style="height: 200px;">' : '',
+      options.content ? '<md-content style="height: 160px;">' : '',
       options.content ? '</md-content>' : '',
       options.headerNoStick ? ' md-no-sticky ' : '',
       options.footerNoStick ? ' md-no-sticky ' : '',
