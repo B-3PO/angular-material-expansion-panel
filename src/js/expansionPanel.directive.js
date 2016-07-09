@@ -77,6 +77,7 @@ function expansionPanelDirective() {
     var topKiller;
     var resizeKiller;
     var onRemoveCallback;
+    var transformParent;
     var isOpen = false;
     var isDisabled = false;
     var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
@@ -265,7 +266,10 @@ function expansionPanelDirective() {
       // listen to md-content scroll events id we are nested in one
       scrollContainer = $mdUtil.getNearestContentElement($element);
       if (scrollContainer.nodeName === 'MD-CONTENT') {
+        transformParent = getTransformParent(scrollContainer);
         angular.element(scrollContainer).on('scroll', debouncedUpdateScroll);
+      } else {
+        transformParent = undefined;
       }
 
       // listen to expanded content scroll if height is set
@@ -305,6 +309,21 @@ function expansionPanelDirective() {
     }
 
 
+
+    function getTransformParent(el) {
+      var parent = el.parentNode;
+      
+      while (parent) {
+        if ($mdUtil.hasComputedStyle(angular.element(parent), 'transform')) {
+          return parent;
+        }
+        parent = parent.parentNode;
+      }
+
+      return undefined;
+    }
+
+
     function updateScroll(e) {
       var top;
       var bottom;
@@ -314,13 +333,14 @@ function expansionPanelDirective() {
       } else {
         bounds = scrollContainer.getBoundingClientRect();
       }
+      var transformTop = transformParent ? transformParent.getBoundingClientRect().top : 0;
 
       // we never want the header going post the top of the page. to prevent this don't allow top to go below 0
       top = Math.max(bounds.top, 0);
       bottom = top + bounds.height;
 
-      if (footerCtrl && footerCtrl.noSticky === false) { footerCtrl.onScroll(top, bottom); }
-      if (headerCtrl && headerCtrl.noSticky === false) { headerCtrl.onScroll(top, bottom); }
+      if (footerCtrl && footerCtrl.noSticky === false) { footerCtrl.onScroll(top, bottom, transformTop); }
+      if (headerCtrl && headerCtrl.noSticky === false) { headerCtrl.onScroll(top, bottom, transformTop); }
     }
 
 

@@ -28,6 +28,9 @@ describe('material.components.expansionPanels', function () {
   beforeEach(module('material.components.expansionPanels'));
   beforeEach(inject(function(_$mdUtil_, _$timeout_, _$animate_) {
     $mdUtil = _$mdUtil_;
+    // getComputedStyle does not work in phantomjs. mock out method
+    $mdUtil.hasComputedStyle = function () { return false; };
+    
     $timeout = _$timeout_;
     $animate = _$animate_;
   }));

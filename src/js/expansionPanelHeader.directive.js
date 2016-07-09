@@ -52,15 +52,22 @@ function expansionPanelHeaderDirective() {
     }
 
 
-    function onScroll(top) {
+    function onScroll(top, bottom, transformTop) {
+      var offset;
+      var panelbottom;
       var bounds = element[0].getBoundingClientRect();
-      var panelbottom = element[0].parentNode.getBoundingClientRect().bottom;
-      var offset = Math.max((top + bounds.height) - panelbottom, 0);
+
 
       if (bounds.top < top) {
+        offset = top - transformTop;
+        panelbottom = element[0].parentNode.getBoundingClientRect().bottom - top - bounds.height;
+        if (panelbottom < 0) {
+          offset += panelbottom;
+        }
+        
         // set container width because element becomes postion fixed
         container.css('width', element[0].offsetWidth + 'px');
-        container.css('top', (top - offset) + 'px');
+        container.css('top', offset + 'px');
 
         // set element height so it does not shink when container is position fixed
         element.css('height', container[0].offsetHeight + 'px');
