@@ -53,24 +53,24 @@ function expansionPanelFooterDirective() {
       unstick();
     }
 
-    function onScroll(top, bottom) {
+    function onScroll(top, bottom, transformTop) {
       var height;
       var footerBounds = element[0].getBoundingClientRect();
-      var panelTop = element[0].parentNode.getBoundingClientRect().top;
-      var offset = panelTop - bottom;
+      var offset;
 
       if (footerBounds.bottom > bottom) {
         height = container[0].offsetHeight;
-
-        // offset will push the fotter down when it hit the top of the card
-        offset = Math.max(offset + height, 0);
+        offset = bottom - height - transformTop;
+        if (offset < element[0].parentNode.getBoundingClientRect().top) {
+          offset = element[0].parentNode.getBoundingClientRect().top;
+        }
 
         // set container width because element becomes postion fixed
         container.css('width', expansionPanelCtrl.$element[0].offsetWidth + 'px');
 
         // set element height so it does not loose its height when container is position fixed
         element.css('height', height + 'px');
-        container.css('top', (bottom - height + offset) + 'px');
+        container.css('top', offset + 'px');
 
         element.addClass('md-stick');
         isStuck = true;
