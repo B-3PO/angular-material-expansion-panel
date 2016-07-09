@@ -24,7 +24,7 @@ function expansionPanelDirective() {
     require: ['mdExpansionPanel', '?^^mdExpansionPanelGroup'],
     scope: true,
     compile: compile,
-    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', controller]
+    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', controller]
   };
   return directive;
 
@@ -63,7 +63,7 @@ function expansionPanelDirective() {
 
 
 
-  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q) {
+  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate) {
     /* jshint validthis: true */
     var vm = this;
 
@@ -78,6 +78,7 @@ function expansionPanelDirective() {
     var resizeKiller;
     var onRemoveCallback;
     var transformParent;
+    var backdrop;
     var isOpen = false;
     var isDisabled = false;
     var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
@@ -134,6 +135,8 @@ function expansionPanelDirective() {
     };
 
     $scope.$on('$destroy', function () {
+      removeClickCatcher();
+
       // remove component from registry
       if (typeof deregister === 'function') {
         deregister();
@@ -149,6 +152,8 @@ function expansionPanelDirective() {
         collapse: collapse,
         remove: remove,
         onRemove: onRemove,
+        addClickCatcher: addClickCatcher,
+        removeClickCatcher: removeClickCatcher,
         componentId: $attrs.mdComponentId
       }, $attrs.mdComponentId);
     }
@@ -312,7 +317,7 @@ function expansionPanelDirective() {
 
     function getTransformParent(el) {
       var parent = el.parentNode;
-      
+
       while (parent) {
         if ($mdUtil.hasComputedStyle(angular.element(parent), 'transform')) {
           return parent;
@@ -347,6 +352,30 @@ function expansionPanelDirective() {
     function updateResize(value) {
       if (footerCtrl && footerCtrl.noSticky === false) { footerCtrl.onResize(value); }
       if (headerCtrl && headerCtrl.noSticky === false) { headerCtrl.onResize(value); }
+    }
+
+
+
+
+    function addClickCatcher(clickCallback) {
+      backdrop = $mdUtil.createBackdrop($scope);
+      backdrop[0].tabIndex = -1;
+
+      if (typeof clickCallback === 'function') {
+        backdrop.on('click', clickCallback);
+      }
+
+      $animate.enter(backdrop, $element.parent(), null, {duration: 0});
+      $element.css('z-index', 60);
+    }
+
+    function removeClickCatcher() {
+      if (backdrop) {
+        backdrop.remove();
+        backdrop.off('click');
+        backdrop = undefined;
+        $element.css('z-index', '');
+      }
     }
   }
 }

@@ -30,7 +30,7 @@ describe('material.components.expansionPanels', function () {
     $mdUtil = _$mdUtil_;
     // getComputedStyle does not work in phantomjs. mock out method
     $mdUtil.hasComputedStyle = function () { return false; };
-    
+
     $timeout = _$timeout_;
     $animate = _$animate_;
   }));
@@ -119,6 +119,34 @@ describe('material.components.expansionPanels', function () {
       $mdExpansionPanel('expansionPanelId').remove();
 
       expect(obj.callback).toHaveBeenCalled();
+    }));
+
+
+    it('should add a click catcher', inject(function($mdExpansionPanel) {
+      var element = getDirective({componentId: 'expansionPanelId'});
+      $mdExpansionPanel('expansionPanelId').addClickCatcher();
+      expect(element.parent().find('md-backdrop')).toBeDefined();
+    }));
+
+
+    it('should call clickback', inject(function($mdExpansionPanel) {
+      var obj = {
+        callback: function () {}
+      };
+      spyOn(obj, 'callback');
+      var element = getDirective({componentId: 'expansionPanelId'});
+      $mdExpansionPanel('expansionPanelId').addClickCatcher(obj.callback);
+      element.parent().find('md-backdrop').triggerHandler('click');
+
+      expect(obj.callback).toHaveBeenCalled();
+    }));
+
+
+    it('should remove click catcher', inject(function($mdExpansionPanel) {
+      var element = getDirective({componentId: 'expansionPanelId'});
+      $mdExpansionPanel('expansionPanelId').addClickCatcher();
+      $mdExpansionPanel('expansionPanelId').removeClickCatcher();
+      expect(element.parent().find('md-backdrop').length).toEqual(0);
     }));
 
   });

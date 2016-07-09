@@ -16,7 +16,7 @@ The expansion panel component can be used with just html or you can use the Expa
 Quick Links:
 * [Installation](#installaton)
 * [Building](#building)
-* [Run Tests](#test)
+* [Run Tests](#tests)
 * [Usage](#usage)
 * [Documentation](#documentation)
 
@@ -161,7 +161,7 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 
 
 
-## mdExpansionPanelGroup
+## <a name="mdExpansionPanelGroup"></a> mdExpansionPanelGroup
 
 `mdExpansionPanelGroup` is a container to manage multiple panels
 
@@ -183,7 +183,8 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 | multiple | string= | <p>allows for more than one panel to be expanded at a time</p>  |
 
 
-## mdExpansionPanel
+
+## <a name="mdExpansionPanel"></a> mdExpansionPanel
 
 `mdExpansionPanel` is the main container for panels
 
@@ -202,7 +203,8 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 
 
 
-## mdExpansionPanelCollapsed
+
+## <a name="mdExpansionPanelCollapsed"></a> mdExpansionPanelCollapsed
 
 `mdExpansionPanelCollapsed` is used to contain content when the panel is collapsed
 
@@ -215,7 +217,8 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 
 
 
-## mdExpansionPanelExpanded
+
+## <a name="mdExpansionPanelExpanded"></a> mdExpansionPanelExpanded
 
 `mdExpansionPanelExpanded` is used to contain content when the panel is expanded
 
@@ -236,7 +239,8 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 
 
 
-## mdExpansionPanelHeader
+
+## <a name="mdExpansionPanelHeader"></a> mdExpansionPanelHeader
 
 `mdExpansionPanelHeader` is nested inside of `mdExpansionPanelExpanded` and contains content you want in place of the collapsed content
 this is optional
@@ -256,7 +260,8 @@ this is optional
 
 
 
-## mdExpansionPanelFooter
+
+## <a name="mdExpansionPanelFooter"></a> mdExpansionPanelFooter
 
 `mdExpansionPanelFooter` is nested inside of `mdExpansionPanelExpanded` and contains content you want at the bottom.
 By default the Footer will stick to the bottom of the page if the panel expands past
@@ -281,7 +286,7 @@ this is optional
 
 ### Services
 
-## $mdExpansionPanel
+## <a name="$mdExpansionPanel"></a> $mdExpansionPanel
 
 Expand and collapse Expansion Panel using its `md-component-id`
 
@@ -382,11 +387,27 @@ Callback for panel when removed from dom
 | callback | function | <p>function called when panel is removed from dom</p>  |
 
 
+### $mdExpansionPanel#addClickCatcher
+
+Add a click catcher that will call a given function when the page surrounding the panel is clicked
+
+**Parameters**
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| callback | function | <p>function called on click</p>  |
+
+
+### $mdExpansionPanel#removeClickCatcher
+
+Remove current click catcher
 
 
 
 
-## $mdExpansionPanelGroup
+
+
+## <a name="$mdExpansionPanelGroup"></a> $mdExpansionPanelGroup
 
 Control expansion panels and allow for adding and registering panels from code
 
