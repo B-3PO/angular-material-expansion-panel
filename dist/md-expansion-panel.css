@@ -119,7 +119,8 @@ md-expansion-panel-expanded {
 /* --- Expansion Panel Header --- */
 md-expansion-panel-header {
   display: block;
-  position: relative; }
+  position: relative;
+  outline: none; }
   md-expansion-panel-header .md-expansion-panel-header-container {
     display: -webkit-box;
     display: -ms-flexbox;

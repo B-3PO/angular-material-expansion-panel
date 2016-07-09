@@ -36,7 +36,7 @@ function expansionPanelDirective() {
     require: ['mdExpansionPanel', '?^^mdExpansionPanelGroup'],
     scope: true,
     compile: compile,
-    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', controller]
+    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', controller]
   };
   return directive;
 
@@ -75,7 +75,7 @@ function expansionPanelDirective() {
 
 
 
-  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q) {
+  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate) {
     /* jshint validthis: true */
     var vm = this;
 
@@ -89,6 +89,8 @@ function expansionPanelDirective() {
     var topKiller;
     var resizeKiller;
     var onRemoveCallback;
+    var transformParent;
+    var backdrop;
     var isOpen = false;
     var isDisabled = false;
     var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
@@ -145,6 +147,8 @@ function expansionPanelDirective() {
     };
 
     $scope.$on('$destroy', function () {
+      removeClickCatcher();
+
       // remove component from registry
       if (typeof deregister === 'function') {
         deregister();
@@ -160,6 +164,8 @@ function expansionPanelDirective() {
         collapse: collapse,
         remove: remove,
         onRemove: onRemove,
+        addClickCatcher: addClickCatcher,
+        removeClickCatcher: removeClickCatcher,
         componentId: $attrs.mdComponentId
       }, $attrs.mdComponentId);
     }
@@ -277,7 +283,10 @@ function expansionPanelDirective() {
       // listen to md-content scroll events id we are nested in one
       scrollContainer = $mdUtil.getNearestContentElement($element);
       if (scrollContainer.nodeName === 'MD-CONTENT') {
+        transformParent = getTransformParent(scrollContainer);
         angular.element(scrollContainer).on('scroll', debouncedUpdateScroll);
+      } else {
+        transformParent = undefined;
       }
 
       // listen to expanded content scroll if height is set
@@ -317,6 +326,21 @@ function expansionPanelDirective() {
     }
 
 
+
+    function getTransformParent(el) {
+      var parent = el.parentNode;
+
+      while (parent) {
+        if ($mdUtil.hasComputedStyle(angular.element(parent), 'transform')) {
+          return parent;
+        }
+        parent = parent.parentNode;
+      }
+
+      return undefined;
+    }
+
+
     function updateScroll(e) {
       var top;
       var bottom;
@@ -326,19 +350,44 @@ function expansionPanelDirective() {
       } else {
         bounds = scrollContainer.getBoundingClientRect();
       }
+      var transformTop = transformParent ? transformParent.getBoundingClientRect().top : 0;
 
       // we never want the header going post the top of the page. to prevent this don't allow top to go below 0
       top = Math.max(bounds.top, 0);
       bottom = top + bounds.height;
 
-      if (footerCtrl && footerCtrl.noSticky === false) { footerCtrl.onScroll(top, bottom); }
-      if (headerCtrl && headerCtrl.noSticky === false) { headerCtrl.onScroll(top, bottom); }
+      if (footerCtrl && footerCtrl.noSticky === false) { footerCtrl.onScroll(top, bottom, transformTop); }
+      if (headerCtrl && headerCtrl.noSticky === false) { headerCtrl.onScroll(top, bottom, transformTop); }
     }
 
 
     function updateResize(value) {
       if (footerCtrl && footerCtrl.noSticky === false) { footerCtrl.onResize(value); }
       if (headerCtrl && headerCtrl.noSticky === false) { headerCtrl.onResize(value); }
+    }
+
+
+
+
+    function addClickCatcher(clickCallback) {
+      backdrop = $mdUtil.createBackdrop($scope);
+      backdrop[0].tabIndex = -1;
+
+      if (typeof clickCallback === 'function') {
+        backdrop.on('click', clickCallback);
+      }
+
+      $animate.enter(backdrop, $element.parent(), null, {duration: 0});
+      $element.css('z-index', 60);
+    }
+
+    function removeClickCatcher() {
+      if (backdrop) {
+        backdrop.remove();
+        backdrop.off('click');
+        backdrop = undefined;
+        $element.css('z-index', '');
+      }
     }
   }
 }
@@ -620,24 +669,24 @@ function expansionPanelFooterDirective() {
       unstick();
     }
 
-    function onScroll(top, bottom) {
+    function onScroll(top, bottom, transformTop) {
       var height;
       var footerBounds = element[0].getBoundingClientRect();
-      var panelTop = element[0].parentNode.getBoundingClientRect().top;
-      var offset = panelTop - bottom;
+      var offset;
 
       if (footerBounds.bottom > bottom) {
         height = container[0].offsetHeight;
-
-        // offset will push the fotter down when it hit the top of the card
-        offset = Math.max(offset + height, 0);
+        offset = bottom - height - transformTop;
+        if (offset < element[0].parentNode.getBoundingClientRect().top) {
+          offset = element[0].parentNode.getBoundingClientRect().top;
+        }
 
         // set container width because element becomes postion fixed
         container.css('width', expansionPanelCtrl.$element[0].offsetWidth + 'px');
 
         // set element height so it does not loose its height when container is position fixed
         element.css('height', height + 'px');
-        container.css('top', (bottom - height + offset) + 'px');
+        container.css('top', offset + 'px');
 
         element.addClass('md-stick');
         isStuck = true;
@@ -1047,15 +1096,22 @@ function expansionPanelHeaderDirective() {
     }
 
 
-    function onScroll(top) {
+    function onScroll(top, bottom, transformTop) {
+      var offset;
+      var panelbottom;
       var bounds = element[0].getBoundingClientRect();
-      var panelbottom = element[0].parentNode.getBoundingClientRect().bottom;
-      var offset = Math.max((top + bounds.height) - panelbottom, 0);
+
 
       if (bounds.top < top) {
+        offset = top - transformTop;
+        panelbottom = element[0].parentNode.getBoundingClientRect().bottom - top - bounds.height;
+        if (panelbottom < 0) {
+          offset += panelbottom;
+        }
+        
         // set container width because element becomes postion fixed
         container.css('width', element[0].offsetWidth + 'px');
-        container.css('top', (top - offset) + 'px');
+        container.css('top', offset + 'px');
 
         // set element height so it does not shink when container is position fixed
         element.css('height', container[0].offsetHeight + 'px');
