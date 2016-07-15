@@ -1,6 +1,6 @@
 {
   "name": "angular-material-expansion-panel",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Material Design Expansion Panels.",
   "main": [
     "dist/md-expansion-panel.js",
