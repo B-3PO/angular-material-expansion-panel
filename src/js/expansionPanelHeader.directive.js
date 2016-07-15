@@ -64,7 +64,7 @@ function expansionPanelHeaderDirective() {
         if (panelbottom < 0) {
           offset += panelbottom;
         }
-        
+
         // set container width because element becomes postion fixed
         container.css('width', element[0].offsetWidth + 'px');
         container.css('top', offset + 'px');
@@ -82,7 +82,7 @@ function expansionPanelHeaderDirective() {
 
     function onResize(width) {
       if (isStuck === false) { return; }
-      element.css('width', width + 'px');
+      container.css('width', width + 'px');
     }
 
 

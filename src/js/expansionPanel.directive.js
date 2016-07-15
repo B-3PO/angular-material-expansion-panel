@@ -285,7 +285,8 @@ function expansionPanelDirective() {
       // listen to window scroll events
       angular.element($window)
         .on('scroll', debouncedUpdateScroll)
-        .on('resize', debouncedUpdateScroll);
+        .on('resize', debouncedUpdateScroll)
+        .on('resize', debouncedUpdateResize);
     }
 
 
@@ -310,7 +311,8 @@ function expansionPanelDirective() {
 
       angular.element($window)
         .off('scroll', debouncedUpdateScroll)
-        .off('resize', debouncedUpdateScroll);
+        .off('resize', debouncedUpdateScroll)
+        .off('resize', debouncedUpdateResize);
     }
 
 
@@ -349,7 +351,8 @@ function expansionPanelDirective() {
     }
 
 
-    function updateResize(value) {
+    function updateResize() {
+      var value = $element[0].offsetWidth;
       if (footerCtrl && footerCtrl.noSticky === false) { footerCtrl.onResize(value); }
       if (headerCtrl && headerCtrl.noSticky === false) { headerCtrl.onResize(value); }
     }
