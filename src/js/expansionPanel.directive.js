@@ -89,6 +89,11 @@ function expansionPanelDirective() {
     vm.registerHeader = function (ctrl) { headerCtrl = ctrl; };
     vm.registerFooter = function (ctrl) { footerCtrl = ctrl; };
 
+
+    if ($attrs.mdComponentId === undefined) {
+      $attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
+    }
+
     vm.$element = $element;
     vm.componentId = $attrs.mdComponentId;
     vm.expand = expand;
