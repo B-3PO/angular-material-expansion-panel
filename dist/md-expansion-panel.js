@@ -297,7 +297,8 @@ function expansionPanelDirective() {
       // listen to window scroll events
       angular.element($window)
         .on('scroll', debouncedUpdateScroll)
-        .on('resize', debouncedUpdateScroll);
+        .on('resize', debouncedUpdateScroll)
+        .on('resize', debouncedUpdateResize);
     }
 
 
@@ -322,7 +323,8 @@ function expansionPanelDirective() {
 
       angular.element($window)
         .off('scroll', debouncedUpdateScroll)
-        .off('resize', debouncedUpdateScroll);
+        .off('resize', debouncedUpdateScroll)
+        .off('resize', debouncedUpdateResize);
     }
 
 
@@ -361,7 +363,8 @@ function expansionPanelDirective() {
     }
 
 
-    function updateResize(value) {
+    function updateResize() {
+      var value = $element[0].offsetWidth;
       if (footerCtrl && footerCtrl.noSticky === false) { footerCtrl.onResize(value); }
       if (headerCtrl && headerCtrl.noSticky === false) { headerCtrl.onResize(value); }
     }
@@ -1108,7 +1111,7 @@ function expansionPanelHeaderDirective() {
         if (panelbottom < 0) {
           offset += panelbottom;
         }
-        
+
         // set container width because element becomes postion fixed
         container.css('width', element[0].offsetWidth + 'px');
         container.css('top', offset + 'px');
@@ -1126,7 +1129,7 @@ function expansionPanelHeaderDirective() {
 
     function onResize(width) {
       if (isStuck === false) { return; }
-      element.css('width', width + 'px');
+      container.css('width', width + 'px');
     }
 
 

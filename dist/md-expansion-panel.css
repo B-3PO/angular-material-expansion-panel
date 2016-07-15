@@ -129,7 +129,10 @@ md-expansion-panel-header {
     line-height: 48px;
     padding: 0 24px;
     box-sizing: border-box;
-    border-bottom: 1px solid; }
+    border-bottom: 1px solid;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center; }
   md-expansion-panel-header.md-stick .md-expansion-panel-header-container {
     position: fixed;
     z-index: 2;
