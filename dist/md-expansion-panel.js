@@ -337,14 +337,25 @@ function expansionPanelDirective() {
     function getTransformParent(el) {
       var parent = el.parentNode;
 
-      while (parent) {
-        if ($mdUtil.hasComputedStyle(angular.element(parent), 'transform')) {
+      while (parent && parent !== document) {
+        if (hasComputedStyle(parent, 'transform')) {
           return parent;
         }
         parent = parent.parentNode;
       }
 
       return undefined;
+    }
+
+    function hasComputedStyle(target, key) {
+      var hasValue = false;
+
+      if (target) {
+        var computedStyles = $window.getComputedStyle(target);
+        hasValue = computedStyles[key] !== undefined && computedStyles[key] !== 'none';
+      }
+
+      return hasValue;
     }
 
 
