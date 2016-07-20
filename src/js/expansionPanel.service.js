@@ -14,8 +14,8 @@ angular
  * @example
  * $mdExpansionPanel('comonentId').then(function (instance) {
  *  instance.exapand();
- *  instance.collapse();
- *  instance.remove();
+ *  instance.collapse({animation: false});
+ *  instance.remove({animation: false});
  *  instance.onRemove(function () {});
  * });
  */

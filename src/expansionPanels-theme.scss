@@ -18,11 +18,8 @@ md-expansion-panel {
     border-color: #DDD;
   }
 
-
-  .md-expansion-panel-icon-container {
-    .md-expansion-panel-icon {
-      color: #999;
-    }
+  .md-expansion-panel-icon svg {
+    fill: #999;
   }
 
 

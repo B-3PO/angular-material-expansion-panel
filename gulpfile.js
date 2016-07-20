@@ -5,6 +5,7 @@ var serve = require('gulp-serve');
 var gulpSequence = require('gulp-sequence');
 var del = require('del');
 var bump = require('gulp-bump');
+var templateCache = require('gulp-angular-templatecache');
 var KarmaServer = require('karma').Server;
 
 
@@ -32,12 +33,13 @@ gulp.task('buildLocal', gulpSequence(
     'jsSrcBuild',
     'jsAppBuild',
     'cssBuild',
-    'copyPartials'
+    'copyPartials',
+    'copyIcons'
   ],
   'indexBuild'
 ));
 
-gulp.task('build', ['jsReleaseBuild', 'cssReleaseBuild']);
+gulp.task('build', gulpSequence('buildIconCache', ['jsReleaseBuild', 'cssReleaseBuild'], 'cleanIconCache'));
 
 
 
@@ -49,6 +51,21 @@ gulp.task('clean', function () {
 gulp.task('copyPartials', function () {
   return gulp.src(paths.partials, {base: paths.app})
     .pipe(gulp.dest(paths.dest));
+});
+
+gulp.task('copyIcons', function () {
+  return gulp.src(paths.icons, {base: paths.src})
+    .pipe(gulp.dest(paths.dest));
+});
+
+gulp.task('buildIconCache', function () {
+  return gulp.src(paths.icons)
+    .pipe(templateCache({module: 'material.components.expansionPanels'}))
+    .pipe(gulp.dest(paths.src));
+});
+
+gulp.task('cleanIconCache', function () {
+  return del('src/templates.js');
 });
 
 gulp.task('serve', serve({

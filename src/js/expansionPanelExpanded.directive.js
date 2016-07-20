@@ -40,15 +40,17 @@ function expansionPanelExpandedDirective($animateCss) {
 
 
 
-    function hide() {
+    function hide(options) {
       var height = setHeight ? setHeight : element[0].scrollHeight + 'px';
       element.addClass('md-hide md-overflow');
       element.removeClass('md-show md-scroll-y');
 
-      $animateCss(element, {
+      var animationParams = {
         from: {'max-height': height, opacity: 1},
         to: {'max-height': '48px', opacity: 0}
-      })
+      };
+      if (options.animation === false) { animationParams.duration = 0; }
+      $animateCss(element, animationParams)
       .start()
       .then(function () {
         element.css('display', 'none');
@@ -57,17 +59,18 @@ function expansionPanelExpandedDirective($animateCss) {
     }
 
 
-    function show() {
+    function show(options) {
       element.css('display', '');
       element.addClass('md-show md-overflow');
-
       // use passed in height or the contents height
       var height = setHeight ? setHeight : element[0].scrollHeight + 'px';
 
-      $animateCss(element, {
+      var animationParams = {
         from: {'max-height': '48px', opacity: 0},
         to: {'max-height': height, opacity: 1}
-      })
+      };
+      if (options.animation === false) { animationParams.duration = 0; }
+      $animateCss(element, animationParams)
       .start()
       .then(function () {
 

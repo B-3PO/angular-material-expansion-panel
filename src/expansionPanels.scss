@@ -29,14 +29,16 @@ md-expansion-panel {
     overflow: hidden;
   }
 
-  &.md-open {
-    transition: margin-top 0.12s cubic-bezier(0.25, 0.8, 0.25, 1),
-                margin-bottom 0.12s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
+  &:not(.md-no-animation) {
+    &.md-open {
+      transition: margin-top 0.12s cubic-bezier(0.25, 0.8, 0.25, 1),
+                  margin-bottom 0.12s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
 
-  &.md-close {
-    transition: margin-top 0.08s cubic-bezier(0.25, 0.8, 0.25, 1),
-                margin-bottom 0.08s cubic-bezier(0.25, 0.8, 0.25, 1);
+    &.md-close {
+      transition: margin-top 0.08s cubic-bezier(0.25, 0.8, 0.25, 1),
+                  margin-bottom 0.08s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
   }
 }
 
@@ -71,28 +73,36 @@ md-expansion-panel-header .md-summary {
 
 /* --- Expansion Panel Collapsed ---- */
 
-md-expansion-panel-collapsed {
-  display: flex;
-  min-height: 48px;
-  line-height: 48px;
-  padding: 0 24px;
-  opacity: 1;
-  z-index: 2;
-  box-sizing: border-box;
+md-expansion-panel {
+  md-expansion-panel-collapsed {
+    display: flex;
+    min-height: 48px;
+    line-height: 48px;
+    padding: 0 24px;
+    opacity: 1;
+    z-index: 2;
+    box-sizing: border-box;
 
 
-  &.md-absolute {
-    position: absolute;
+    &.md-absolute {
+      position: absolute;
+    }
+
+    &.md-hide {
+      opacity: 0;
+    }
   }
 
-  &.md-show {
-    transition: opacity 0.03s linear;
-    transition-delay: 0.03s;
-  }
+  &:not(.md-no-animation) {
+    md-expansion-panel-collapsed {
+      &.md-show {
+        transition: opacity 0.03s linear;
+      }
 
-  &.md-hide {
-    transition: opacity 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
-    opacity: 0;
+      &.md-hide {
+        transition: opacity 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+    }
   }
 }
 
@@ -101,38 +111,44 @@ md-expansion-panel-collapsed {
 
 /* --- Expansion Panel Expanded --- */
 
-md-expansion-panel-expanded {
-  display: none;
-  min-height: 48px;
+md-expansion-panel {
+  md-expansion-panel-expanded {
+    display: none;
+    min-height: 48px;
 
 
-  &.md-show {
-    transition: max-height 0.12s cubic-bezier(0.25, 0.8, 0.25, 1),
-                opacity 0.12s cubic-bezier(0.25, 0.8, 0.25, 1);
+    &.md-show,
+    &.md-hide {
+      display: block;
+    }
+
+    &.md-scroll-y {
+      overflow-y: auto;
+    }
+
+    &.md-overflow {
+      overflow: hidden
+    }
+
+
+    md-expansion-panel-content {
+      display: block;
+      padding: 16px 24px;
+    }
   }
 
-  &.md-hide {
-    transition: max-height 0.08s cubic-bezier(0.25, 0.8, 0.25, 1),
-                opacity 0.08s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
+  &:not(.md-no-animation) {
+    md-expansion-panel-expanded {
+      &.md-show {
+        transition: max-height 0.12s cubic-bezier(0.25, 0.8, 0.25, 1),
+                    opacity 0.12s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
 
-  &.md-show,
-  &.md-hide {
-    display: block;
-  }
-
-  &.md-scroll-y {
-    overflow-y: auto;
-  }
-
-  &.md-overflow {
-    overflow: hidden
-  }
-
-
-  md-expansion-panel-content {
-    display: block;
-    padding: 16px 24px;
+      &.md-hide {
+        transition: max-height 0.06s cubic-bezier(0.25, 0.8, 0.25, 1),
+                    opacity 0.06s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+    }
   }
 }
 
@@ -211,40 +227,22 @@ md-expansion-panel-footer {
 /* --- expand icon --- */
 
 md-expansion-panel {
-  .md-expansion-panel-icon-container {
-    &:first-child {
-      padding-right: 12px;
-    }
-
-
+  &:not(.md-no-animation) {
     .md-expansion-panel-icon {
-      &:after {
-        font-family: 'mdMaterialIcons';
-        font-size: 18px;
-        font-weight: 600;
-        display: block;
-        content: '\e315';
-        position: relative;
-        speak: none;
-        transform: rotate(0deg);
-        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
+      transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+  }
+
+  .md-expansion-panel-icon {
+    &:first-child {
+      margin-right: 18px;
     }
   }
 
 
   &.md-open {
-    > {
-      md-expansion-panel-collasped,
-      md-expansion-panel-header {
-        .md-expansion-panel-icon-container {
-          .md-expansion-panel-icon {
-            &:after {
-              transform: rotate(90deg);
-            }
-          }
-        }
-      }
+    .md-expansion-panel-icon {
+      transform: rotate(90deg);
     }
   }
 }

@@ -40,7 +40,7 @@ function GroupController($mdExpansionPanelGroup) {
 
     setTimeout(function () {
       change();
-    }, 10000)
+    }, 10000);
   });
 
   function addTemplated() {

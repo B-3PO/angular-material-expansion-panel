@@ -165,9 +165,10 @@ function expansionPanelDirective() {
 
 
 
-    function expand() {
+    function expand(options) {
       if (isOpen === true || isDisabled === true) { return; }
       isOpen = true;
+      options = options || {};
 
       var deferred = $q.defer();
 
@@ -177,45 +178,57 @@ function expansionPanelDirective() {
 
       $element.removeClass('md-close');
       $element.addClass('md-open');
+      if (options.animation === false) {
+        $element.addClass('md-no-animation');
+      } else {
+        $element.removeClass('md-no-animation');
+      }
 
       initEvents();
-      collapsedCtrl.hide();
-      expandedCtrl.show();
+      collapsedCtrl.hide(options);
+      expandedCtrl.show(options);
 
-      if (headerCtrl) { headerCtrl.show(); }
-      if (footerCtrl) { footerCtrl.show(); }
+      if (headerCtrl) { headerCtrl.show(options); }
+      if (footerCtrl) { footerCtrl.show(options); }
 
       $timeout(function () {
         deferred.resolve();
-      }, ANIMATION_TIME);
+      }, options.animation === false ? 0 : ANIMATION_TIME);
       return deferred.promise;
     }
 
 
-    function collapse() {
+    function collapse(options) {
       if (isOpen === false) { return; }
       isOpen = false;
+      options = options || {};
 
       var deferred = $q.defer();
 
       $element.addClass('md-close');
       $element.removeClass('md-open');
+      if (options.animation === false) {
+        $element.addClass('md-no-animation');
+      } else {
+        $element.removeClass('md-no-animation');
+      }
 
       killEvents();
-      collapsedCtrl.show();
-      expandedCtrl.hide();
+      collapsedCtrl.show(options);
+      expandedCtrl.hide(options);
 
-      if (headerCtrl) { headerCtrl.hide(); }
-      if (footerCtrl) { footerCtrl.hide(); }
+      if (headerCtrl) { headerCtrl.hide(options); }
+      if (footerCtrl) { footerCtrl.hide(options); }
 
       $timeout(function () {
         deferred.resolve();
-      }, ANIMATION_TIME);
+      }, options.animation === false ? 0 : ANIMATION_TIME);
       return deferred.promise;
     }
 
 
-    function remove(noAnimation) {
+    function remove(options) {
+      options = options || {};
       var deferred = $q.defer();
 
       if (vm.epxansionPanelGroupCtrl) {
@@ -227,7 +240,7 @@ function expansionPanelDirective() {
         deregister = undefined;
       }
 
-      if (noAnimation === true || isOpen === false) {
+      if (options.animation === false || isOpen === false) {
         $scope.$destroy();
         $element.remove();
         deferred.resolve();

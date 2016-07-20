@@ -9,5 +9,6 @@ exports.paths = {
   appCss: ['app/style.css', 'app/**/*.css'],
   injectCss: ['public/*.css', 'public/**/*.css'],
   partials: ['app/**/*.html'],
+  icons: ['src/**/*.svg'],
   bower: './bower.json'
 };

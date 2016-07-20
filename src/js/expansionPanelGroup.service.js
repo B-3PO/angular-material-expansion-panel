@@ -19,8 +19,8 @@ angular
  *    controller: 'Controller'
  *  });
  *  instance.add('cardComponentId', {local: localData});
- *  instance.remove('cardComponentId');
- *  instance.removeAll();
+ *  instance.remove('cardComponentId', {animation: false});
+ *  instance.removeAll({animation: false});
  * });
  */
 expansionPanelGroupService.$inject = ['$mdComponentRegistry', '$mdUtil', '$mdExpansionPanel', '$templateRequest', '$rootScope', '$compile', '$controller', '$q', '$log'];
@@ -91,12 +91,12 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
       instance.register(name, options);
     }
 
-    function remove(componentId) {
-      return instance.remove(componentId);
+    function remove(componentId, options) {
+      return instance.remove(componentId, options);
     }
 
-    function removeAll(noAnimation) {
-      instance.removeAll(noAnimation);
+    function removeAll(options) {
+      instance.removeAll(options);
     }
 
     function onChange(callback) {

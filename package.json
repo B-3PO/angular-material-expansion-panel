@@ -2,7 +2,7 @@
   "name": "angular-material-expansion-panel",
   "version": "0.4.8",
   "author": "Ben Rubin",
-  "description": "Material Design Expansion Panels.",
+  "description": "Material Design Expansion Panels for angular material",
   "keywords": "material, material-design, design, angular, component, expansion, panel, panels",
   "license": "MIT",
   "repository": {
@@ -13,7 +13,7 @@
     "bump": "^0.2.5",
     "del": "^2.2.0",
     "gulp": "^3.9.1",
-    "gulp-angular-templatecache": "^1.8.0",
+    "gulp-angular-templatecache": "^1.9.1",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-bump": "^1.0.0",
     "gulp-concat": "^2.6.0",
