@@ -10,6 +10,7 @@ angular
     'material.core'
   ]);
 }());
+(function(){"use strict";angular.module("material.components.expansionPanels").run(["$templateCache", function($templateCache) {$templateCache.put("icons/ic_keyboard_arrow_right_black_24px.svg","<svg fill=\"#000000\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\">\n    <path d=\"M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z\"/>\n    <path d=\"M0-.25h24v24H0z\" fill=\"none\"/>\n</svg>");}]);}());
 (function(){"use strict";angular
   .module('material.components.expansionPanels')
   .directive('mdExpansionPanel', expansionPanelDirective);
@@ -177,9 +178,10 @@ function expansionPanelDirective() {
 
 
 
-    function expand() {
+    function expand(options) {
       if (isOpen === true || isDisabled === true) { return; }
       isOpen = true;
+      options = options || {};
 
       var deferred = $q.defer();
 
@@ -189,45 +191,57 @@ function expansionPanelDirective() {
 
       $element.removeClass('md-close');
       $element.addClass('md-open');
+      if (options.animation === false) {
+        $element.addClass('md-no-animation');
+      } else {
+        $element.removeClass('md-no-animation');
+      }
 
       initEvents();
-      collapsedCtrl.hide();
-      expandedCtrl.show();
+      collapsedCtrl.hide(options);
+      expandedCtrl.show(options);
 
-      if (headerCtrl) { headerCtrl.show(); }
-      if (footerCtrl) { footerCtrl.show(); }
+      if (headerCtrl) { headerCtrl.show(options); }
+      if (footerCtrl) { footerCtrl.show(options); }
 
       $timeout(function () {
         deferred.resolve();
-      }, ANIMATION_TIME);
+      }, options.animation === false ? 0 : ANIMATION_TIME);
       return deferred.promise;
     }
 
 
-    function collapse() {
+    function collapse(options) {
       if (isOpen === false) { return; }
       isOpen = false;
+      options = options || {};
 
       var deferred = $q.defer();
 
       $element.addClass('md-close');
       $element.removeClass('md-open');
+      if (options.animation === false) {
+        $element.addClass('md-no-animation');
+      } else {
+        $element.removeClass('md-no-animation');
+      }
 
       killEvents();
-      collapsedCtrl.show();
-      expandedCtrl.hide();
+      collapsedCtrl.show(options);
+      expandedCtrl.hide(options);
 
-      if (headerCtrl) { headerCtrl.hide(); }
-      if (footerCtrl) { footerCtrl.hide(); }
+      if (headerCtrl) { headerCtrl.hide(options); }
+      if (footerCtrl) { footerCtrl.hide(options); }
 
       $timeout(function () {
         deferred.resolve();
-      }, ANIMATION_TIME);
+      }, options.animation === false ? 0 : ANIMATION_TIME);
       return deferred.promise;
     }
 
 
-    function remove(noAnimation) {
+    function remove(options) {
+      options = options || {};
       var deferred = $q.defer();
 
       if (vm.epxansionPanelGroupCtrl) {
@@ -239,7 +253,7 @@ function expansionPanelDirective() {
         deregister = undefined;
       }
 
-      if (noAnimation === true || isOpen === false) {
+      if (options.animation === false || isOpen === false) {
         $scope.$destroy();
         $element.remove();
         deferred.resolve();
@@ -427,8 +441,8 @@ function expansionPanelDirective() {
  * @example
  * $mdExpansionPanel('comonentId').then(function (instance) {
  *  instance.exapand();
- *  instance.collapse();
- *  instance.remove();
+ *  instance.collapse({animation: false});
+ *  instance.remove({animation: false});
  *  instance.onRemove(function () {});
  * });
  */
@@ -502,18 +516,20 @@ function expansionPanelCollapsedDirective($animateCss) {
     });
 
 
-    function hide() {
+    function hide(options) {
       // set width to maintian demensions when element is set to postion: absolute
       element.css('width', element[0].offsetWidth + 'px');
-
       // set min height so the expansion panel does not shrink when collapsed element is set to position: absolute
       expansionPanelCtrl.$element.css('min-height', element[0].offsetHeight + 'px');
 
-      $animateCss(element, {
+      var animationParams = {
         addClass: 'md-absolute md-hide',
         from: {opacity: 1},
         to: {opacity: 0}
-      })
+      };
+      if (options.animation === false) { animationParams.duration = 0; }
+      void 0;
+      $animateCss(element, animationParams)
       .start()
       .then(function () {
         element.removeClass('md-hide');
@@ -522,17 +538,18 @@ function expansionPanelCollapsedDirective($animateCss) {
     }
 
 
-    function show() {
+    function show(options) {
       element.css('display', '');
-
       // set width to maintian demensions when element is set to postion: absolute
       element.css('width', element[0].parentNode.offsetWidth + 'px');
 
-      $animateCss(element, {
+      var animationParams = {
         addClass: 'md-show',
         from: {opacity: 0},
         to: {opacity: 1}
-      })
+      };
+      if (options.animation === false) { animationParams.duration = 0; }
+      $animateCss(element, animationParams)
       .start()
       .then(function () {
         element.removeClass('md-absolute md-show');
@@ -589,15 +606,17 @@ function expansionPanelExpandedDirective($animateCss) {
 
 
 
-    function hide() {
+    function hide(options) {
       var height = setHeight ? setHeight : element[0].scrollHeight + 'px';
       element.addClass('md-hide md-overflow');
       element.removeClass('md-show md-scroll-y');
 
-      $animateCss(element, {
+      var animationParams = {
         from: {'max-height': height, opacity: 1},
         to: {'max-height': '48px', opacity: 0}
-      })
+      };
+      if (options.animation === false) { animationParams.duration = 0; }
+      $animateCss(element, animationParams)
       .start()
       .then(function () {
         element.css('display', 'none');
@@ -606,17 +625,18 @@ function expansionPanelExpandedDirective($animateCss) {
     }
 
 
-    function show() {
+    function show(options) {
       element.css('display', '');
       element.addClass('md-show md-overflow');
-
       // use passed in height or the contents height
       var height = setHeight ? setHeight : element[0].scrollHeight + 'px';
 
-      $animateCss(element, {
+      var animationParams = {
         from: {'max-height': '48px', opacity: 0},
         to: {'max-height': height, opacity: 1}
-      })
+      };
+      if (options.animation === false) { animationParams.duration = 0; }
+      $animateCss(element, animationParams)
       .start()
       .then(function () {
 
@@ -827,13 +847,13 @@ function expansionPanelGroupDirective() {
       closeOthers(componentId);
     }
 
-    function remove(componentId, noAnimation) {
-      return panels[componentId].remove(noAnimation);
+    function remove(componentId, options) {
+      return panels[componentId].remove(options);
     }
 
-    function removeAll(noAnimation) {
+    function removeAll(options) {
       Object.keys(panels).forEach(function (panelId) {
-        panels[panelId].remove(noAnimation);
+        panels[panelId].remove(options);
       });
     }
 
@@ -893,8 +913,8 @@ function expansionPanelGroupDirective() {
  *    controller: 'Controller'
  *  });
  *  instance.add('cardComponentId', {local: localData});
- *  instance.remove('cardComponentId');
- *  instance.removeAll();
+ *  instance.remove('cardComponentId', {animation: false});
+ *  instance.removeAll({animation: false});
  * });
  */
 expansionPanelGroupService.$inject = ['$mdComponentRegistry', '$mdUtil', '$mdExpansionPanel', '$templateRequest', '$rootScope', '$compile', '$controller', '$q', '$log'];
@@ -965,12 +985,12 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
       instance.register(name, options);
     }
 
-    function remove(componentId) {
-      return instance.remove(componentId);
+    function remove(componentId, options) {
+      return instance.remove(componentId, options);
     }
 
-    function removeAll(noAnimation) {
-      instance.removeAll(noAnimation);
+    function removeAll(options) {
+      instance.removeAll(options);
     }
 
     function onChange(callback) {
@@ -1158,5 +1178,31 @@ function expansionPanelHeaderDirective() {
       element.addClass('md-no-stick');
     }
   }
+}
+}());
+(function(){"use strict";angular
+  .module('material.components.expansionPanels')
+  .directive('mdExpansionPanelIcon', mdExpansionPanelIconDirective);
+
+
+
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelIcon
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelIcon` can be used in both `md-expansion-panel-collapsed` and `md-expansion-panel-header` as the first or last element.
+ * Adding this will provide a animated arrow for expanded and collapsed states
+ **/
+function mdExpansionPanelIconDirective() {
+  var directive = {
+    restrict: 'E',
+    template: '<md-icon class="md-expansion-panel-icon" md-svg-icon="icons/ic_keyboard_arrow_right_black_24px.svg"></md-icon>',
+    replace: true
+  };
+  return directive;
 }
 }());
