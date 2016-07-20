@@ -106,11 +106,12 @@ gulp test
 **Example Template**
 
 ```html
-<md-expansion-panel>
+<md-expansion-panel md-component-id="panelOne">
 
   <md-expansion-panel-collapsed>
     <div class="md-title">Title</div>
     <div class="md-summary">Summary</div>
+    <md-expansion-panel-icon></md-expansion-panel-icon>
   </md-expansion-panel-collapsed>
 
 
@@ -119,6 +120,7 @@ gulp test
     <md-expansion-panel-header>
       <div class="md-title">Expanded Title</div>
       <div class="md-summary">Expanded Summary</div>
+      <md-expansion-panel-icon></md-expansion-panel-icon>
     </md-expansion-panel-header>
 
     <md-expansion-panel-content>
@@ -134,6 +136,98 @@ gulp test
   </md-expansion-panel-expanded>
 
 </md-expansion-panel>
+```
+```javascript
+angular.module('app').controller('ctrl', function ($mdExpansionPanel) {
+  // async
+  $mdExpansionPanel().waitFor('panelOne').then(function (instance) {
+    instance.expand();
+    instance.collapse({animation: false});
+    instance.remove();
+  });
+
+  // sync
+  $mdExpansionPanel('panelOne').expand();
+});
+```
+
+
+**Example Group**
+```html
+<md-expansion-panel-group md-component-id="panelGroup" multiple>
+  <md-expansion-panel md-component-id="panelOne">
+    <md-expansion-panel-collapsed></md-expansion-panel-collapsed>
+    <md-expansion-panel-expanded>
+      <md-expansion-panel-header></md-expansion-panel-header>
+      <md-expansion-panel-content></md-expansion-panel-content>
+      <md-expansion-panel-footer></md-expansion-panel-footer>
+    </md-expansion-panel-expanded>
+  </md-expansion-panel>
+
+  <md-expansion-panel md-component-id="panelTwo">
+    <md-expansion-panel-collapsed></md-expansion-panel-collapsed>
+    <md-expansion-panel-expanded>
+      <md-expansion-panel-header></md-expansion-panel-header>
+      <md-expansion-panel-content></md-expansion-panel-content>
+      <md-expansion-panel-footer></md-expansion-panel-footer>
+    </md-expansion-panel-expanded>
+  </md-expansion-panel>
+</md-expansion-panel-group>
+```
+```javascript
+angular.module('app').controller('ctrl', function ($mdExpansionPanelGroup) {
+  // async
+  $mdExpansionPanelGroup().waitFor('panelGroup').then(function (instance) {
+    instance.remove('panelOne');
+    instance.remove('panelTwo', {animation: false});
+  });
+
+  // sync
+  $mdExpansionPanelGroup('panelOne').removeAll({animation: false});
+});
+```
+
+
+
+**Example Register Panels to group**
+```html
+<md-expansion-panel-group md-component-id="panelGroup" multiple>
+</md-expansion-panel-group>
+```
+```javascript
+angular.module('app').controller('ctrl', function ($scope, $mdExpansionPanelGroup) {
+
+  $mdExpansionPanelGroup().waitFor('panelGroup').then(function (instance) {
+    instance.register('panelOne', {
+      templateUrl: 'templateOne.html',
+      controller: 'TemplateOneController',
+      controllerAs: 'vm'
+    });
+
+    instance.register('panelTwo', {
+      templateUrl: 'templateTwo.html',
+      controller: 'TemplateTwoController',
+      controllerAs: 'vm'
+    });
+  });
+
+
+  $scope.addPanelOne = function () {
+    $mdExpansionPanelGroup('panelGroup').add('panelOne', {localParam: 'some data'});
+  };
+
+  $scope.addPanelTwo = function () {
+    $mdExpansionPanelGroup('panelGroup').add('panelTwo');
+  };
+
+  $scope.removePanelOne = function () {
+    $mdExpansionPanelGroup('panelGroup').remove('panelOne');
+  };
+
+  $scope.removeAll = function () {
+    $mdExpansionPanelGroup('panelGroup').removeAll({animation: false});
+  };
+});
 ```
 
 
@@ -153,6 +247,7 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 * [mdExpansionPanelExpanded](#mdExpansionPanelExpanded)
 * [mdExpansionPanelHeader](#mdExpansionPanelHeader)
 * [mdExpansionPanelFooter](#mdExpansionPanelFooter)
+* [mdExpansionPanelIcon](#mdExpansionPanelIcon)
 * [$mdExpansionPanel](#$mdExpansionPanel)
 * [$mdExpansionPanelGroup](#$mdExpansionPanelGroup)
 
@@ -211,7 +306,7 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 ```
 <md-expansion-panel-collapsed>
 ...
-</md-expansion-panel>
+</md-expansion-panel-collapsed>
 ```
 
 
@@ -282,6 +377,16 @@ this is optional
 
 
 
+## <a name="mdExpansionPanelIcon"></a> mdExpansionPanelIcon
+
+`mdExpansionPanelIcon` can be used in both `md-expansion-panel-collapsed` and `md-expansion-panel-header` as the first or last element. Adding this will provide a animated arrow for expanded and collapsed states
+
+```
+<md-expansion-panel-icon></md-expansion-panel-icon>
+```
+
+
+
 
 
 ### Services
@@ -294,14 +399,14 @@ Expand and collapse Expansion Panel using its `md-component-id`
 // sync
 $mdExpansionPanel('theComponentId').expand();
 $mdExpansionPanel('theComponentId').contract();
-$mdExpansionPanel('theComponentId').remove();
+$mdExpansionPanel('theComponentId').remove({animation: false});
 $mdExpansionPanel('theComponentId').onRemove(function () {});
 
 // Async
 $mdExpansionPanel().waitFor('theComponentId').then(function (instance) {
   instance.expand();
   instance.contract();
-  instance.remove();
+  instance.remove({animation: false});
   instance.onRemove(function () {});
 });
 ```
@@ -341,6 +446,13 @@ You can use this in 2 ways
 
 Exapnd Panel
 
+**Parameters**
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| options | object= | <p>object with options</p>  |
+| options#animation | boolean= | <p>set to false if you want no animations</p>  |
+
 **Returns**
 
 | Param | Details |
@@ -351,6 +463,13 @@ Exapnd Panel
 ### $mdExpansionPanel#collapse
 
 Collapse Panle
+
+**Parameters**
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| options | object= | <p>object with options</p>  |
+| options#animation | boolean= | <p>set to false if you want no animations</p>  |
 
 **Returns**
 
@@ -367,7 +486,8 @@ Remove panel from document
 
 | Param | Type | Details |
 | :--: | :--: | :--: |
-| noAnimation | boolean= | <p>remove without closeing animation</p>  |
+| options | object= | <p>object with options</p>  |
+| options#animation | boolean= | <p>set to false if you want no animations</p>  |
 
 **Returns**
 
@@ -445,7 +565,7 @@ $mdExpansionPanelGroup().waitFor('theComponentId').then(function (instance) {
 
   instance.add('name', {locals: 'data'});
   instance.remove('name');
-  instance.removeAll();
+  instance.removeAll({animation: false});
   instance.count();
   var killOnChange = instance.onChange(function (count) {});
 });
@@ -537,6 +657,8 @@ Remove a panel form the group
 | Param | Type | Details |
 | :--: | :--: | :--: |
 | componentId | string | <p>component id on panel</p>  |
+| options | object= | <p>object with options</p>  |
+| options#animation | boolean= | <p>set to false if you want no animations</p>  |
 
 **Returns**
 
@@ -548,6 +670,13 @@ Remove a panel form the group
 ### $mdExpansionPanelGroup#removeAll
 
 Remove all panels form the group
+
+**Parameters**
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| options | object= | <p>object with options</p>  |
+| options#animation | boolean= | <p>set to false if you want no animations</p>  |
 
 
 ### $mdExpansionPanelGroup#count
