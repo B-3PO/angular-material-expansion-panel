@@ -234,6 +234,7 @@ md-expansion-panel {
   }
 
   .md-expansion-panel-icon {
+    transform: rotate(90deg);
     &:first-child {
       margin-right: 18px;
     }
@@ -242,7 +243,7 @@ md-expansion-panel {
 
   &.md-open {
     .md-expansion-panel-icon {
-      transform: rotate(90deg);
+      transform: rotate(-90deg);
     }
   }
 }
