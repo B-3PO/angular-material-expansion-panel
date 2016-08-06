@@ -212,9 +212,9 @@ describe('material.components.expansionPanels', function () {
         inst.add({
           template: getTemplate({componentId: 'expansionPanelId'}),
           controller: function () {}
+        }).then(function () {
+          inst.remove('expansionPanelId');
         });
-
-        inst.remove('expansionPanelId');
       });
 
       var element = getGroupDirective();
@@ -237,9 +237,9 @@ describe('material.components.expansionPanels', function () {
         inst.add({
           template: getTemplate({componentId: 'expansionPanelTwo'}),
           controller: function () {}
+        }).then(function () {
+          inst.removeAll();
         });
-
-        inst.removeAll();
       });
 
       var element = getGroupDirective();

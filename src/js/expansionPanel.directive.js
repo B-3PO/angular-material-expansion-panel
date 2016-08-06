@@ -24,7 +24,7 @@ function expansionPanelDirective() {
     require: ['mdExpansionPanel', '?^^mdExpansionPanelGroup'],
     scope: true,
     compile: compile,
-    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', controller]
+    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', '$parse', controller]
   };
   return directive;
 
@@ -47,23 +47,15 @@ function expansionPanelDirective() {
       var epxansionPanelCtrl = ctrls[0];
       var epxansionPanelGroupCtrl = ctrls[1];
 
-      if (epxansionPanelGroupCtrl) {
-        epxansionPanelCtrl.epxansionPanelGroupCtrl = epxansionPanelGroupCtrl;
-        epxansionPanelGroupCtrl.addPanel(epxansionPanelCtrl.componentId, {
-          expand: epxansionPanelCtrl.expand,
-          collapse: epxansionPanelCtrl.collapse,
-          remove: epxansionPanelCtrl.remove,
-          onRemove: epxansionPanelCtrl.onRemove,
-          destroy: epxansionPanelCtrl.destroy,
-        });
-      }
+      epxansionPanelCtrl.epxansionPanelGroupCtrl = epxansionPanelGroupCtrl || undefined;
+      epxansionPanelCtrl.init();
     };
   }
 
 
 
 
-  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate) {
+  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate, $parse) {
     /* jshint validthis: true */
     var vm = this;
 
@@ -79,6 +71,8 @@ function expansionPanelDirective() {
     var onRemoveCallback;
     var transformParent;
     var backdrop;
+    var inited = false;
+    var registerOnInit = false;
     var isOpen = false;
     var isDisabled = false;
     var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
@@ -90,17 +84,23 @@ function expansionPanelDirective() {
     vm.registerFooter = function (ctrl) { footerCtrl = ctrl; };
 
 
+
     if ($attrs.mdComponentId === undefined) {
       $attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
+      registerPanel();
+    } else {
+      $attrs.$observe('mdComponentId', function() {
+        registerPanel();
+      });
     }
 
     vm.$element = $element;
-    vm.componentId = $attrs.mdComponentId;
     vm.expand = expand;
     vm.collapse = collapse;
     vm.remove = remove;
     vm.destroy = destroy;
     vm.onRemove = onRemove;
+    vm.init = init;
 
     $attrs.$observe('disabled', function(disabled) {
       isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
@@ -151,7 +151,39 @@ function expansionPanelDirective() {
     });
 
 
-    if ($attrs.mdComponentId) {
+
+
+
+    function init() {
+      inited = true;
+      if (registerOnInit === true) {
+        registerPanel();
+      }
+    }
+
+
+    function registerPanel() {
+      if (inited === false) {
+        registerOnInit = true;
+        return;
+      }
+
+      // deregister if component was already registered
+      if (typeof deregister === 'function') {
+        deregister();
+        deregister = undefined;
+      }
+      // remove component from group ctrl if component was already added
+      if (vm.componentId && vm.epxansionPanelGroupCtrl) {
+        vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
+      }
+
+      // if componentId was removed then set one
+      if ($attrs.mdComponentId === undefined) {
+        $attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
+      }
+
+      vm.componentId = $attrs.mdComponentId;
       deregister = $mdComponentRegistry.register({
         expand: expand,
         collapse: collapse,
@@ -161,8 +193,17 @@ function expansionPanelDirective() {
         removeClickCatcher: removeClickCatcher,
         componentId: $attrs.mdComponentId
       }, $attrs.mdComponentId);
-    }
 
+      if (vm.epxansionPanelGroupCtrl) {
+        vm.epxansionPanelGroupCtrl.addPanel(vm.componentId, {
+          expand: vm.expand,
+          collapse: vm.collapse,
+          remove: vm.remove,
+          onRemove: vm.onRemove,
+          destroy: vm.destroy,
+        });
+      }
+    }
 
 
     function expand(options) {
