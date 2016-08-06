@@ -48,7 +48,6 @@ function expansionPanelCollapsedDirective($animateCss) {
         to: {opacity: 0}
       };
       if (options.animation === false) { animationParams.duration = 0; }
-      console.log(animationParams);
       $animateCss(element, animationParams)
       .start()
       .then(function () {
