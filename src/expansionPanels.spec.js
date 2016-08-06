@@ -149,6 +149,19 @@ describe('material.components.expansionPanels', function () {
       expect(element.parent().find('md-backdrop').length).toEqual(0);
     }));
 
+
+    it('should return false for isOpen', inject(function($mdExpansionPanel) {
+      var element = getDirective({componentId: 'expansionPanelId'});
+      expect($mdExpansionPanel('expansionPanelId').isOpen()).toBe(false);
+    }));
+
+    it('should return true for isOpen', inject(function($mdExpansionPanel) {
+      var element = getDirective({componentId: 'expansionPanelId'});
+      $mdExpansionPanel('expansionPanelId').expand();
+      flushAnimations();
+
+      expect($mdExpansionPanel('expansionPanelId').isOpen()).toBe(true);
+    }));
   });
 
 
@@ -363,6 +376,18 @@ describe('material.components.expansionPanels', function () {
       var element = getDirective();
       element.scope().$panel.remove();
       expect(element.scope()).toBeUndefined();
+    }));
+
+    it('should return false for isOpen', inject(function($mdExpansionPanel) {
+      var element = getDirective();
+      expect(element.scope().$panel.isOpen()).toBe(false);
+    }));
+
+    it('should return true for isOpen', inject(function($mdExpansionPanel) {
+      var element = getDirective();
+      element.scope().$panel.expand();
+      flushAnimations();
+      expect(element.scope().$panel.isOpen()).toBe(true);
     }));
 
 

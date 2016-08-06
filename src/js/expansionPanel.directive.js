@@ -73,7 +73,7 @@ function expansionPanelDirective() {
     var backdrop;
     var inited = false;
     var registerOnInit = false;
-    var isOpen = false;
+    var _isOpen = false;
     var isDisabled = false;
     var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
     var debouncedUpdateResize = $$rAF.throttle(updateResize);
@@ -136,7 +136,8 @@ function expansionPanelDirective() {
     $scope.$panel = {
       collapse: collapse,
       expand: expand,
-      remove: remove
+      remove: remove,
+      isOpen: isOpen
     };
 
     $scope.$on('$destroy', function () {
@@ -189,6 +190,7 @@ function expansionPanelDirective() {
         collapse: collapse,
         remove: remove,
         onRemove: onRemove,
+        isOpen: isOpen,
         addClickCatcher: addClickCatcher,
         removeClickCatcher: removeClickCatcher,
         componentId: $attrs.mdComponentId
@@ -196,19 +198,24 @@ function expansionPanelDirective() {
 
       if (vm.epxansionPanelGroupCtrl) {
         vm.epxansionPanelGroupCtrl.addPanel(vm.componentId, {
-          expand: vm.expand,
-          collapse: vm.collapse,
-          remove: vm.remove,
-          onRemove: vm.onRemove,
-          destroy: vm.destroy,
+          expand: expand,
+          collapse: collapse,
+          remove: remove,
+          onRemove: onRemove,
+          destroy: destroy,
+          isOpen: isOpen
         });
       }
     }
 
 
+    function isOpen() {
+      return _isOpen;
+    }
+
     function expand(options) {
-      if (isOpen === true || isDisabled === true) { return; }
-      isOpen = true;
+      if (_isOpen === true || isDisabled === true) { return; }
+      _isOpen = true;
       options = options || {};
 
       var deferred = $q.defer();
@@ -240,8 +247,8 @@ function expansionPanelDirective() {
 
 
     function collapse(options) {
-      if (isOpen === false) { return; }
-      isOpen = false;
+      if (_isOpen === false) { return; }
+      _isOpen = false;
       options = options || {};
 
       var deferred = $q.defer();
@@ -281,7 +288,7 @@ function expansionPanelDirective() {
         deregister = undefined;
       }
 
-      if (options.animation === false || isOpen === false) {
+      if (options.animation === false || _isOpen === false) {
         $scope.$destroy();
         $element.remove();
         deferred.resolve();
