@@ -144,6 +144,7 @@ angular.module('app').controller('ctrl', function ($mdExpansionPanel) {
     instance.expand();
     instance.collapse({animation: false});
     instance.remove();
+    instance.isOpen();
   });
 
   // sync
@@ -401,6 +402,7 @@ $mdExpansionPanel('theComponentId').expand();
 $mdExpansionPanel('theComponentId').contract();
 $mdExpansionPanel('theComponentId').remove({animation: false});
 $mdExpansionPanel('theComponentId').onRemove(function () {});
+$mdExpansionPanel('theComponentId').isOpen();
 
 // Async
 $mdExpansionPanel().waitFor('theComponentId').then(function (instance) {
@@ -408,6 +410,7 @@ $mdExpansionPanel().waitFor('theComponentId').then(function (instance) {
   instance.contract();
   instance.remove({animation: false});
   instance.onRemove(function () {});
+  instance.isOpen();
 });
 ```
 
@@ -462,7 +465,7 @@ Exapnd Panel
 
 ### $mdExpansionPanel#collapse
 
-Collapse Panle
+Collapse Panel
 
 **Parameters**
 
@@ -521,6 +524,17 @@ Add a click catcher that will call a given function when the page surrounding th
 ### $mdExpansionPanel#removeClickCatcher
 
 Remove current click catcher
+
+
+### $mdExpansionPanel#isOpen
+
+Returns boolean
+
+**Returns**
+
+| Type | Details |
+| :--: | :--: |
+| boolean | <p>true if panel is expanded false if panel is collapsed</p>  |
 
 
 

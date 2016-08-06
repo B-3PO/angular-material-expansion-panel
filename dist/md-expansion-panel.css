@@ -171,12 +171,15 @@ md-expansion-panel:not(.md-no-animation) .md-expansion-panel-icon {
   transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
   transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), -webkit-transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); }
 
-md-expansion-panel .md-expansion-panel-icon:first-child {
-  margin-right: 18px; }
-
-md-expansion-panel.md-open .md-expansion-panel-icon {
+md-expansion-panel .md-expansion-panel-icon {
   -webkit-transform: rotate(90deg);
           transform: rotate(90deg); }
+  md-expansion-panel .md-expansion-panel-icon:first-child {
+    margin-right: 18px; }
+
+md-expansion-panel.md-open .md-expansion-panel-icon {
+  -webkit-transform: rotate(-90deg);
+          transform: rotate(-90deg); }
 
 @-webkit-keyframes panelBodyHeaderStickyHoverIn {
   0% {

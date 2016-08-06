@@ -37,7 +37,7 @@ function expansionPanelDirective() {
     require: ['mdExpansionPanel', '?^^mdExpansionPanelGroup'],
     scope: true,
     compile: compile,
-    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', controller]
+    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', '$parse', controller]
   };
   return directive;
 
@@ -60,23 +60,15 @@ function expansionPanelDirective() {
       var epxansionPanelCtrl = ctrls[0];
       var epxansionPanelGroupCtrl = ctrls[1];
 
-      if (epxansionPanelGroupCtrl) {
-        epxansionPanelCtrl.epxansionPanelGroupCtrl = epxansionPanelGroupCtrl;
-        epxansionPanelGroupCtrl.addPanel(epxansionPanelCtrl.componentId, {
-          expand: epxansionPanelCtrl.expand,
-          collapse: epxansionPanelCtrl.collapse,
-          remove: epxansionPanelCtrl.remove,
-          onRemove: epxansionPanelCtrl.onRemove,
-          destroy: epxansionPanelCtrl.destroy,
-        });
-      }
+      epxansionPanelCtrl.epxansionPanelGroupCtrl = epxansionPanelGroupCtrl || undefined;
+      epxansionPanelCtrl.init();
     };
   }
 
 
 
 
-  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate) {
+  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate, $parse) {
     /* jshint validthis: true */
     var vm = this;
 
@@ -92,7 +84,9 @@ function expansionPanelDirective() {
     var onRemoveCallback;
     var transformParent;
     var backdrop;
-    var isOpen = false;
+    var inited = false;
+    var registerOnInit = false;
+    var _isOpen = false;
     var isDisabled = false;
     var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
     var debouncedUpdateResize = $$rAF.throttle(updateResize);
@@ -103,17 +97,23 @@ function expansionPanelDirective() {
     vm.registerFooter = function (ctrl) { footerCtrl = ctrl; };
 
 
+
     if ($attrs.mdComponentId === undefined) {
       $attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
+      registerPanel();
+    } else {
+      $attrs.$observe('mdComponentId', function() {
+        registerPanel();
+      });
     }
 
     vm.$element = $element;
-    vm.componentId = $attrs.mdComponentId;
     vm.expand = expand;
     vm.collapse = collapse;
     vm.remove = remove;
     vm.destroy = destroy;
     vm.onRemove = onRemove;
+    vm.init = init;
 
     $attrs.$observe('disabled', function(disabled) {
       isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
@@ -149,7 +149,8 @@ function expansionPanelDirective() {
     $scope.$panel = {
       collapse: collapse,
       expand: expand,
-      remove: remove
+      remove: remove,
+      isOpen: isOpen
     };
 
     $scope.$on('$destroy', function () {
@@ -164,23 +165,70 @@ function expansionPanelDirective() {
     });
 
 
-    if ($attrs.mdComponentId) {
+
+
+
+    function init() {
+      inited = true;
+      if (registerOnInit === true) {
+        registerPanel();
+      }
+    }
+
+
+    function registerPanel() {
+      if (inited === false) {
+        registerOnInit = true;
+        return;
+      }
+
+      // deregister if component was already registered
+      if (typeof deregister === 'function') {
+        deregister();
+        deregister = undefined;
+      }
+      // remove component from group ctrl if component was already added
+      if (vm.componentId && vm.epxansionPanelGroupCtrl) {
+        vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
+      }
+
+      // if componentId was removed then set one
+      if ($attrs.mdComponentId === undefined) {
+        $attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
+      }
+
+      vm.componentId = $attrs.mdComponentId;
       deregister = $mdComponentRegistry.register({
         expand: expand,
         collapse: collapse,
         remove: remove,
         onRemove: onRemove,
+        isOpen: isOpen,
         addClickCatcher: addClickCatcher,
         removeClickCatcher: removeClickCatcher,
         componentId: $attrs.mdComponentId
       }, $attrs.mdComponentId);
+
+      if (vm.epxansionPanelGroupCtrl) {
+        vm.epxansionPanelGroupCtrl.addPanel(vm.componentId, {
+          expand: expand,
+          collapse: collapse,
+          remove: remove,
+          onRemove: onRemove,
+          destroy: destroy,
+          isOpen: isOpen
+        });
+      }
     }
 
 
+    function isOpen() {
+      return _isOpen;
+    }
 
     function expand(options) {
-      if (isOpen === true || isDisabled === true) { return; }
-      isOpen = true;
+      if (_isOpen === true || isDisabled === true) { return; }
+      _isOpen = true;
       options = options || {};
 
       var deferred = $q.defer();
@@ -212,8 +260,8 @@ function expansionPanelDirective() {
 
 
     function collapse(options) {
-      if (isOpen === false) { return; }
-      isOpen = false;
+      if (_isOpen === false) { return; }
+      _isOpen = false;
       options = options || {};
 
       var deferred = $q.defer();
@@ -253,7 +301,7 @@ function expansionPanelDirective() {
         deregister = undefined;
       }
 
-      if (options.animation === false || isOpen === false) {
+      if (options.animation === false || _isOpen === false) {
         $scope.$destroy();
         $element.remove();
         deferred.resolve();
@@ -528,7 +576,6 @@ function expansionPanelCollapsedDirective($animateCss) {
         to: {opacity: 0}
       };
       if (options.animation === false) { animationParams.duration = 0; }
-      void 0;
       $animateCss(element, animationParams)
       .start()
       .then(function () {
