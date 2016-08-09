@@ -242,7 +242,11 @@ md-expansion-panel {
 
 
   &.md-open {
-    .md-expansion-panel-icon {
+    > md-expansion-panel-expanded > md-expansion-panel-header .md-expansion-panel-header-container .md-expansion-panel-icon {
+      transform: rotate(-90deg);
+    }
+
+    > md-expansion-panel.md-open > md-expansion-panel-collapsed .md-expansion-panel-icon {
       transform: rotate(-90deg);
     }
   }
