@@ -9,6 +9,7 @@
     "type": "git",
     "url": "git://github.com/B-3PO/angular-material-expansion-panel.git"
   },
+  "main": "index.js",
   "devDependencies": {
     "bump": "^0.2.5",
     "del": "^2.2.0",
