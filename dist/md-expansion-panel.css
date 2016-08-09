@@ -177,7 +177,11 @@ md-expansion-panel .md-expansion-panel-icon {
   md-expansion-panel .md-expansion-panel-icon:first-child {
     margin-right: 18px; }
 
-md-expansion-panel.md-open .md-expansion-panel-icon {
+md-expansion-panel.md-open > md-expansion-panel-expanded > md-expansion-panel-header .md-expansion-panel-header-container .md-expansion-panel-icon {
+  -webkit-transform: rotate(-90deg);
+          transform: rotate(-90deg); }
+
+md-expansion-panel.md-open > md-expansion-panel.md-open > md-expansion-panel-collapsed .md-expansion-panel-icon {
   -webkit-transform: rotate(-90deg);
           transform: rotate(-90deg); }
 
