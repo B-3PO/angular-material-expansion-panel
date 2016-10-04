@@ -14,8 +14,8 @@ angular
  * @description
  * `mdExpansionPanelCollapsed` is used to contain content when the panel is collapsed
  **/
-expansionPanelCollapsedDirective.$inject = ['$animateCss'];
-function expansionPanelCollapsedDirective($animateCss) {
+expansionPanelCollapsedDirective.$inject = ['$animateCss', '$timeout'];
+function expansionPanelCollapsedDirective($animateCss, $timeout) {
   var directive = {
     restrict: 'E',
     require: '^^mdExpansionPanel',
@@ -71,13 +71,20 @@ function expansionPanelCollapsedDirective($animateCss) {
       $animateCss(element, animationParams)
       .start()
       .then(function () {
+        // safari will animate the min-height if transition is not set to 0
+        expansionPanelCtrl.$element.css('transition', 'none');
         element.removeClass('md-absolute md-show');
 
         // remove width when element is no longer position: absolute
         element.css('width', '');
 
+
         // remove min height when element is no longer position: absolute
         expansionPanelCtrl.$element.css('min-height', '');
+        // remove transition block on next digest
+        $timeout(function () {
+          expansionPanelCtrl.$element.css('transition', '');
+        }, 0);
       });
     }
   }

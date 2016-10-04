@@ -16,8 +16,8 @@ angular
  *
  * @param {number=} height - add this aatribute set the max height of the expanded content. The container will be set to scroll
  **/
-expansionPanelExpandedDirective.$inject = ['$animateCss'];
-function expansionPanelExpandedDirective($animateCss) {
+expansionPanelExpandedDirective.$inject = ['$animateCss', '$timeout'];
+function expansionPanelExpandedDirective($animateCss, $timeout) {
   var directive = {
     restrict: 'E',
     require: '^^mdExpansionPanel',
@@ -78,7 +78,13 @@ function expansionPanelExpandedDirective($animateCss) {
         if (setHeight !== undefined) {
           element.addClass('md-scroll-y');
         } else {
+          // safari will animate the max-height if transition is not set to 0
+          element.css('transition', 'none');
           element.css('max-height', 'none');
+          // remove transition block on next digest
+          $timeout(function () {
+            element.css('transition', '');
+          }, 0);
         }
 
         element.removeClass('md-overflow');

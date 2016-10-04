@@ -542,8 +542,8 @@ function expansionPanelService($mdComponentRegistry, $mdUtil, $log) {
  * @description
  * `mdExpansionPanelCollapsed` is used to contain content when the panel is collapsed
  **/
-expansionPanelCollapsedDirective.$inject = ['$animateCss'];
-function expansionPanelCollapsedDirective($animateCss) {
+expansionPanelCollapsedDirective.$inject = ['$animateCss', '$timeout'];
+function expansionPanelCollapsedDirective($animateCss, $timeout) {
   var directive = {
     restrict: 'E',
     require: '^^mdExpansionPanel',
@@ -599,13 +599,20 @@ function expansionPanelCollapsedDirective($animateCss) {
       $animateCss(element, animationParams)
       .start()
       .then(function () {
+        // safari will animate the min-height if transition is not set to 0
+        expansionPanelCtrl.$element.css('transition', 'none');
         element.removeClass('md-absolute md-show');
 
         // remove width when element is no longer position: absolute
         element.css('width', '');
 
+
         // remove min height when element is no longer position: absolute
         expansionPanelCtrl.$element.css('min-height', '');
+        // remove transition block on next digest
+        $timeout(function () {
+          expansionPanelCtrl.$element.css('transition', '');
+        }, 0);
       });
     }
   }
@@ -629,8 +636,8 @@ function expansionPanelCollapsedDirective($animateCss) {
  *
  * @param {number=} height - add this aatribute set the max height of the expanded content. The container will be set to scroll
  **/
-expansionPanelExpandedDirective.$inject = ['$animateCss'];
-function expansionPanelExpandedDirective($animateCss) {
+expansionPanelExpandedDirective.$inject = ['$animateCss', '$timeout'];
+function expansionPanelExpandedDirective($animateCss, $timeout) {
   var directive = {
     restrict: 'E',
     require: '^^mdExpansionPanel',
@@ -691,7 +698,13 @@ function expansionPanelExpandedDirective($animateCss) {
         if (setHeight !== undefined) {
           element.addClass('md-scroll-y');
         } else {
+          // safari will animate the max-height if transition is not set to 0
+          element.css('transition', 'none');
           element.css('max-height', 'none');
+          // remove transition block on next digest
+          $timeout(function () {
+            element.css('transition', '');
+          }, 0);
         }
 
         element.removeClass('md-overflow');
