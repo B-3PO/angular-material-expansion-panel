@@ -559,6 +559,9 @@ $mdExpansionPanelGroup('theComponentId').add({
 });
 $mdExpansionPanelGroup('theComponentId').remove('name');
 $mdExpansionPanelGroup('theComponentId').removeAll();
+$mdExpansionPanelGroup('theComponentId').collapseAll();
+$mdExpansionPanelGroup('theComponentId').getAll();
+$mdExpansionPanelGroup('theComponentId').getOpen();
 $mdExpansionPanelGroup('theComponentId').count();
 var killOnChange = $mdExpansionPanelGroup('theComponentId').onChange(function (count) {});
 
@@ -581,6 +584,9 @@ $mdExpansionPanelGroup().waitFor('theComponentId').then(function (instance) {
   instance.remove('name');
   instance.removeAll({animation: false});
   instance.count();
+  instance.collapseAll();
+  instance.getAll();
+  instance.getOpen();
   var killOnChange = instance.onChange(function (count) {});
 });
 ```
@@ -720,3 +726,23 @@ A function that is called whenever a panel is added or removed from dom. This wi
 | Type | Details |
 | :--: | :--: |
 | function | <p>a function you can call to stop listening</p>  |
+
+
+### $mdExpansionPanelGroup#getAll
+
+Returns all panel instances from group
+
+### $mdExpansionPanelGroup#getOpen
+
+Returns all open panel instances from group
+
+
+### $mdExpansionPanelGroup#collapseAll
+
+Collapse all panels in group
+
+**Parameters**
+
+| Param | Type | Details |
+| :--: | :--: | :--: |
+| noAnimation | boolean=false | <p>set to true if you want no animations</p>  |
