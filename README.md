@@ -7,10 +7,15 @@ To see Material Design Expansion Panels Specification go [here](https://material
 The expansion panel component can be used with just html or you can use the Expansion Panel Group to control multiple panels through code
 
 
+## Demo
+Demo Hosted on github.io
+[Click Here](https://b-3po.github.io/angular-material-expansion-panel)
+
 <div style="border: 1px solid #ccc">
   <img src="https://cloud.githubusercontent.com/assets/11681147/16354667/4d9afefe-3a61-11e6-91a6-8f5addc40d0c.gif" alt="Angular Material docs website" style="display:block;">
 </div>
 <br />
+
 
 
 Quick Links:
