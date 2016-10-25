@@ -73,8 +73,11 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
     var service = {
       add: add,
       register: register,
+      getAll: getAll,
+      getOpen: getOpen,
       remove: remove,
       removeAll: removeAll,
+      collapseAll: collapseAll,
       onChange: onChange,
       count: count
     };
@@ -105,6 +108,18 @@ function expansionPanelGroupService($mdComponentRegistry, $mdUtil, $mdExpansionP
 
     function count() {
       return instance.count();
+    }
+
+    function getAll() {
+      return instance.getAll();
+    }
+
+    function getOpen() {
+      return instance.getOpen();
+    }
+
+    function collapseAll(noAnimation) {
+      instance.collapseAll(noAnimation);
     }
 
 

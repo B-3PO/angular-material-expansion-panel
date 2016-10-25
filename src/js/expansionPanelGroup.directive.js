@@ -40,8 +40,11 @@ function expansionPanelGroupDirective() {
       $element: $element,
       register: register,
       getRegistered: getRegistered,
+      getAll: getAll,
+      getOpen: getOpen,
       remove: remove,
       removeAll: removeAll,
+      collapseAll: collapseAll,
       onChange: onChange,
       count: panelCount
     }, $attrs.mdComponentId);
@@ -136,6 +139,28 @@ function expansionPanelGroupDirective() {
         throw Error('$mdExpansionPanelGroup.addPanel() Cannot find Panel with name of "' + name + '"');
       }
       return registered[name];
+    }
+
+
+    function getAll() {
+      return Object.keys(panels).map(function (panelId) {
+        return panels[panelId];
+      });
+    }
+
+    function getOpen() {
+      return Object.keys(panels).map(function (panelId) {
+        return panels[panelId];
+      }).filter(function (instance) {
+        return instance.isOpen();
+      });
+    }
+
+    function collapseAll(noAnimation) {
+      var animation = noAnimation === true ? false : true;
+      Object.keys(panels).forEach(function (panelId) {
+        panels[panelId].collapse({animation: animation});
+      });
     }
   }
 }
