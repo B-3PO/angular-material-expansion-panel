@@ -40,6 +40,21 @@ gulp.task('buildLocal', gulpSequence(
 ));
 
 gulp.task('build', gulpSequence('buildIconCache', ['jsReleaseBuild', 'cssReleaseBuild'], 'cleanIconCache'));
+gulp.task('docs', gulpSequence(
+  'buildLocal',
+  'copyPublicToDocs',
+  'copyBowerToDocs'
+));
+
+gulp.task('copyPublicToDocs', function () {
+  return gulp.src('public/**/*')
+    .pipe(gulp.dest('docs/'));
+});
+
+gulp.task('copyBowerToDocs', function () {
+  return gulp.src('bower_components/**/*')
+    .pipe(gulp.dest('docs/'));
+});
 
 
 
