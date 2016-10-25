@@ -263,6 +263,91 @@ describe('material.components.expansionPanels', function () {
     }));
 
 
+    it('should get all panel instances', inject(function($mdExpansionPanelGroup) {
+      var instance;
+      var all = [];
+
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
+        instance = inst;
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelOne'}),
+          controller: function () {}
+        });
+
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelTwo'}),
+          controller: function () {}
+        }).then(function () {
+          all = inst.getAll();
+        });
+      });
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(all.length).toBe(2);
+    }));
+
+
+    it('should get opened panel instances', inject(function($mdExpansionPanelGroup) {
+      var instance;
+      var open = [];
+
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
+        instance = inst;
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelOne'}),
+          controller: function () {}
+        });
+
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelTwo'}),
+          controller: function () {}
+        }).then(function (panelInst) {
+
+          panelInst.expand().then(function () {
+            open = inst.getOpen();
+          })
+        });
+      });
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(open.length).toBe(1);
+    }));
+
+
+    it('should collapse all panels', inject(function($mdExpansionPanelGroup) {
+      var instance;
+      var open = [];
+
+      $mdExpansionPanelGroup().waitFor('expansionPanelGroupId').then(function(inst) {
+        instance = inst;
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelOne'}),
+          controller: function () {}
+        });
+
+        inst.add({
+          template: getTemplate({componentId: 'expansionPanelTwo'}),
+          controller: function () {}
+        }).then(function (panelInst) {
+
+          panelInst.expand().then(function () {
+            instance.collapseAll();
+            open = inst.getOpen();
+          })
+        });
+      });
+
+      var element = getGroupDirective();
+      $timeout.flush();
+
+      expect(open.length).toBe(0);
+    }));
+
+
 
     it('should call onChange callback', inject(function($mdExpansionPanelGroup) {
       var obj = {
