@@ -102,15 +102,17 @@ function expansionPanelDirective() {
     vm.onRemove = onRemove;
     vm.init = init;
 
-    $attrs.$observe('disabled', function(disabled) {
-      isDisabled = (typeof disabled === 'string' && disabled !== 'false') ? true : false;
+	isDisabled = (typeof $attrs.disabled === 'string' && $attrs.disabled !== 'false') ? true : false;
 
-      if (isDisabled === true) {
-        $element.attr('tabindex', '-1');
-      } else {
-        $element.attr('tabindex', '0');
-      }
-    });
+	setTabIndex();
+
+	$scope.$watch($attrs.ngDisabled, function(disabled) {
+	  if (typeof disabled !== 'undefined') {
+        isDisabled = disabled;
+
+        setTabIndex();
+	  }
+	});
 
     $element
       .on('focus', function (ev) {
@@ -132,6 +134,13 @@ function expansionPanelDirective() {
       }
     }
 
+	function setTabIndex() {
+		if (isDisabled === true) {
+    	  $element.attr('tabindex', '-1');
+    	} else {
+    	  $element.attr('tabindex', '0');
+    	}
+    }
 
     $scope.$panel = {
       collapse: collapse,

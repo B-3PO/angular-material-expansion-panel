@@ -8,8 +8,13 @@ function HomeController($scope, $mdExpansionPanel) {
     instance.expand();
   });
 
+  $scope.arePanelsDisabled = false;
 
   $scope.collapseOne = function () {
     $mdExpansionPanel('expansionPanelOne').collapse();
+  };
+
+  $scope.toggleDisablePanels = function () {
+    $scope.arePanelsDisabled = !$scope.arePanelsDisabled; // test
   };
 }
