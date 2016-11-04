@@ -104,14 +104,13 @@ function expansionPanelDirective() {
 
 	isDisabled = (typeof $attrs.disabled === 'string' && $attrs.disabled !== 'false') ? true : false;
 
-	setTabIndex();
+	$element.attr('tabindex', isDisabled ? -1 : 0);
 
-	$scope.$watch($attrs.ngDisabled, function(disabled) {
-	  if (typeof disabled !== 'undefined') {
-        isDisabled = disabled;
-
-        setTabIndex();
-	  }
+	$scope.$watch($attrs.ngDisabled, function(value) {
+		if (typeof value !== 'undefined') {
+			isDisabled = value;
+			$element.attr('tabindex', isDisabled ? -1 : 0);
+		}
 	});
 
     $element
@@ -132,14 +131,6 @@ function expansionPanelDirective() {
           collapse();
           break;
       }
-    }
-
-	function setTabIndex() {
-		if (isDisabled === true) {
-    	  $element.attr('tabindex', '-1');
-    	} else {
-    	  $element.attr('tabindex', '0');
-    	}
     }
 
     $scope.$panel = {
