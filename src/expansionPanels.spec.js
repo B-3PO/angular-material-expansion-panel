@@ -429,6 +429,28 @@ describe('material.components.expansionPanels', function () {
     });
 
 
+    it('should set `tabindex` to `-1` if `ng-disabled` is true', function () {
+      var element = getDirective({ngDisabled: 'isDisabled'});
+      scope.isDisabled = true;
+      scope.$digest();
+      expect(element.attr('tabindex')).toEqual('-1');
+    });
+
+    it('should set `tabindex` to `0` if `ng-disabled` is false', function () {
+      var element = getDirective({ngDisabled: 'isDisabled'});
+      scope.isDisabled = false;
+      scope.$digest();
+      expect(element.attr('tabindex')).toEqual('0');
+    });
+
+    it('should set `tabindex` to `0` if `ng-disabled` is not set', function () {
+      var element = getDirective({ngDisabled: 'isDisabled'});
+      scope.isDisabled = undefined;
+      scope.$digest();
+      expect(element.attr('tabindex')).toEqual('0');
+    });
+
+
     it('should thow errors on invalid markup', inject(function($compile, $rootScope) {
       function buildBadPanelOne() {
         $compile('<md-expansion-panel></md-expansion-panel>')($rootScope);
@@ -851,7 +873,7 @@ describe('material.components.expansionPanels', function () {
     options = options || {};
 
     return $mdUtil.supplant('{2}' +
-    '<md-expansion-panel {0}{6}>'+
+    '<md-expansion-panel {0}{6}{7}>'+
       '><md-expansion-panel-collapsed>'+
         '<div class="md-title">Title</div>'+
         '<div class="md-summary">Summary</div>'+
@@ -878,7 +900,8 @@ describe('material.components.expansionPanels', function () {
       options.content ? '</md-content>' : '',
       options.headerNoStick ? ' md-no-sticky ' : '',
       options.footerNoStick ? ' md-no-sticky ' : '',
-      options.componentId ? ' md-component-id="'+options.componentId+'" ' : ''
+      options.componentId ? ' md-component-id="'+options.componentId+'" ' : '',
+      options.ngDisabled ? ' ng-disabled="'+options.ngDisabled+'" ' : ''
     ]);
   }
 

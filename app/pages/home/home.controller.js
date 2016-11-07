@@ -12,4 +12,6 @@ function HomeController($scope, $mdExpansionPanel) {
   $scope.collapseOne = function () {
     $mdExpansionPanel('expansionPanelOne').collapse();
   };
+
+  $scope.isDisabled = true;
 }

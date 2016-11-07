@@ -25,7 +25,14 @@ md-expansion-panel {
 
   &[disabled] {
     md-expansion-panel-collapsed {
-      color: #DDD;
+      .md-title,
+      .md-summary {
+        color: #DDD;
+      }
+    }
+
+    .md-expansion-panel-icon svg {
+      fill: #DDD;
     }
   }
 
