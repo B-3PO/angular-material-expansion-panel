@@ -150,3 +150,35 @@
   </md-expansion-panel-expanded>
 
 </md-expansion-panel>
+
+
+
+<md-expansion-panel ng-disabled="isDisabled">
+
+  <md-expansion-panel-collapsed>
+    <div class="md-title">Disabled Panel</div>
+    <span flex></span>
+    <md-expansion-panel-icon></md-expansion-panel-icon>
+  </md-expansion-panel-collapsed>
+
+  <md-expansion-panel-expanded>
+
+    <md-expansion-panel-header>
+      <div class="md-title">Disabled Panel</div>
+      <div class="md-summary">Expanded Summary</div>
+      <md-expansion-panel-icon></md-expansion-panel-icon>
+    </md-expansion-panel-header>
+
+    <md-expansion-panel-content>
+      <h4>Content</h4>
+      <p>Put content in here</p>
+    </md-expansion-panel-content>
+
+    <md-expansion-panel-footer>
+      <div flex></div>
+      <md-button class="md-warn" ng-click="$panel.collapse()">Collapse</md-button>
+    </md-expansion-panel-footer>
+
+  </md-expansion-panel-expanded>
+
+</md-expansion-panel>
