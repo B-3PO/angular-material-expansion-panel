@@ -16,8 +16,11 @@ md-expansion-panel {
     border-color: #DDD; }
   md-expansion-panel .md-expansion-panel-icon svg {
     fill: #999; }
-  md-expansion-panel[disabled] md-expansion-panel-collapsed {
+  md-expansion-panel[disabled] md-expansion-panel-collapsed .md-title,
+  md-expansion-panel[disabled] md-expansion-panel-collapsed .md-summary {
     color: #DDD; }
+  md-expansion-panel[disabled] .md-expansion-panel-icon svg {
+    fill: #DDD; }
   md-expansion-panel:not(.md-open):not([disabled]):focus,
   md-expansion-panel:not(.md-open):not([disabled]):focus md-expansion-panel-collapsed {
     background: #EEE; }
