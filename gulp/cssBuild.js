@@ -30,7 +30,7 @@ exports.release = function () {
     .pipe(concat('md-expansion-panel.css'))
     .pipe(autoprefixer())
     .pipe(gulp.dest(paths.build))
-    .pipe(cssnano())
+    .pipe(cssnano({zindex: false}))
     .pipe(rename('md-expansion-panel.min.css'))
     .pipe(gulp.dest(paths.build))
     .on('end', function(){
