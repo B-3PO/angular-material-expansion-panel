@@ -7,8 +7,8 @@ angular.module('angularMaterialExpansionPanel', [
   .config(configApp);
 
 
-configApp.$inject = ['$routeProvider'];
-function configApp($routeProvider) {
+configApp.$inject = ['$routeProvider', '$locationProvider'];
+function configApp($routeProvider, $locationProvider) {
   $routeProvider
     .when('/', {
       templateUrl: 'pages/home/home.html',
@@ -30,5 +30,12 @@ function configApp($routeProvider) {
       controller: 'MultipleController',
       controllerAs: 'vm'
     })
+    .when('/events', {
+      templateUrl: 'pages/events/events.html',
+      controller: 'EventsController',
+      controllerAs: 'vm'
+    })
     .otherwise('/');
+
+	$locationProvider.hashPrefix('');
 }
