@@ -43,6 +43,11 @@ function expansionPanelHeaderDirective() {
       onResize: onResize
     });
 
+    element.on('click', function () {
+      expansionPanelCtrl.collapse();
+      // remove focus on parent md-expansion-panel
+	  element.parent().parent().blur();
+    });
 
     function show() {
 

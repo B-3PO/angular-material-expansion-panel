@@ -83,7 +83,6 @@ md-expansion-panel {
     z-index: 2;
     box-sizing: border-box;
 
-
     &.md-absolute {
       position: absolute;
     }
@@ -91,6 +90,7 @@ md-expansion-panel {
     &.md-hide {
       opacity: 0;
     }
+
   }
 
   &:not(.md-no-animation) {
@@ -103,6 +103,12 @@ md-expansion-panel {
         transition: opacity 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
     }
+  }
+
+  &:not([disabled]) {
+    md-expansion-panel-collapsed {
+      cursor: pointer;
+	}
   }
 }
 
@@ -170,6 +176,7 @@ md-expansion-panel-header {
     box-sizing: border-box;
     border-bottom: 1px solid;
     align-items: center;
+	cursor: pointer;
   }
 
   &.md-stick {
