@@ -30,6 +30,11 @@ function configApp($routeProvider, $locationProvider) {
       controller: 'MultipleController',
       controllerAs: 'vm'
     })
+    .when('/events', {
+      templateUrl: 'pages/events/events.html',
+      controller: 'EventsController',
+      controllerAs: 'vm'
+    })
     .otherwise('/');
 
 	$locationProvider.hashPrefix('');

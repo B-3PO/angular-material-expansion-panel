@@ -232,6 +232,7 @@ function expansionPanelDirective() {
       options = options || {};
 
       var deferred = $q.defer();
+        $scope.$emit("mdExpansionPanelExpanding", vm.componentId);
 
       if (vm.epxansionPanelGroupCtrl) {
         vm.epxansionPanelGroupCtrl.expandPanel(vm.componentId);
@@ -254,6 +255,7 @@ function expansionPanelDirective() {
 
       $timeout(function () {
         deferred.resolve();
+        $scope.$emit("mdExpansionPanelExpanded", vm.componentId);
       }, options.animation === false ? 0 : ANIMATION_TIME);
       return deferred.promise;
     }
@@ -265,6 +267,7 @@ function expansionPanelDirective() {
       options = options || {};
 
       var deferred = $q.defer();
+      $scope.$emit("mdExpansionPanelCollapsing", vm.componentId);
 
       $element.addClass('md-close');
       $element.removeClass('md-open');
@@ -283,6 +286,7 @@ function expansionPanelDirective() {
 
       $timeout(function () {
         deferred.resolve();
+        $scope.$emit("mdExpansionPanelCollapsed", vm.componentId);
       }, options.animation === false ? 0 : ANIMATION_TIME);
       return deferred.promise;
     }
