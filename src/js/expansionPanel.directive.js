@@ -24,7 +24,7 @@ function expansionPanelDirective() {
     require: ['mdExpansionPanel', '?^^mdExpansionPanelGroup'],
     scope: true,
     compile: compile,
-    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', '$parse', controller]
+    controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', '$parse', '$compile', controller]
   };
   return directive;
 
@@ -55,7 +55,7 @@ function expansionPanelDirective() {
 
 
 
-  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate, $parse) {
+  function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate, $parse, $compile) {
     /* jshint validthis: true */
     var vm = this;
 
@@ -219,7 +219,7 @@ function expansionPanelDirective() {
       options = options || {};
 
       var deferred = $q.defer();
-        $scope.$emit("mdExpansionPanelExpanding", vm.componentId);
+      $scope.$emit("mdExpansionPanelExpanding", vm.componentId);
 
       if (vm.epxansionPanelGroupCtrl) {
         vm.epxansionPanelGroupCtrl.expandPanel(vm.componentId);
@@ -235,6 +235,13 @@ function expansionPanelDirective() {
 
       initEvents();
       collapsedCtrl.hide(options);
+
+      if (expandedCtrl.innerTemplate) {
+        expandedCtrl.$element.append(expandedCtrl.innerTemplate);
+        $compile(expandedCtrl.$element.children())($scope);
+        // set to null to that it gets compile only once
+        expandedCtrl.innerTemplate = null;
+      }
       expandedCtrl.show(options);
 
       if (headerCtrl) { headerCtrl.show(options); }

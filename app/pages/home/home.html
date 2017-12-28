@@ -182,3 +182,70 @@
   </md-expansion-panel-expanded>
 
 </md-expansion-panel>
+
+<div style="padding-top: 12px; padding-bottom: 36px;">
+  <md-divider></md-divider>
+</div>
+
+<h2>Lazy render content</h2>
+<p>
+  When there is a long list of expansion panels with heavy content in the expanded area,
+  it's could take a lot to render all the DOM elements.
+  In that case use the <code>lazy-render</code> option!
+</p>
+
+<md-expansion-panel>
+
+  <md-expansion-panel-collapsed>
+    <div class="md-title">No Sticky</div>
+    <div class="md-summary">header and footer sticky disabled</div>
+  </md-expansion-panel-collapsed>
+
+  <md-expansion-panel-expanded lazy-render>
+
+    <md-expansion-panel-header md-no-sticky>
+      <div class="md-title">No Sticky</div>
+      <div class="md-summary">header and footer sticky disabled</div>
+    </md-expansion-panel-header>
+
+    <md-expansion-panel-content>
+      <h4>Content</h4>
+      <p>Put content in here</p>
+
+      <h4>Content</h4>
+      <p>Put content in here</p>
+
+      <h4>Content</h4>
+      <p>Put content in here</p>
+
+      <h4>Content</h4>
+      <p>Put content in here</p>
+
+      <h4>Content</h4>
+      <p>Put content in here</p>
+
+      <h4>Content</h4>
+      <p>Put content in here</p>
+
+      <h4>Content</h4>
+      <p>Put content in here</p>
+
+      <h4>Content</h4>
+      <p>Put content in here</p>
+
+      <h4>Content</h4>
+      <p>Put content in here</p>
+    </md-expansion-panel-content>
+
+    <md-expansion-panel-footer md-no-sticky>
+      <div flex></div>
+      <md-button class="md-warn" ng-click="$panel.collapse()">Collapse</md-button>
+    </md-expansion-panel-footer>
+
+  </md-expansion-panel-expanded>
+
+</md-expansion-panel>
+
+<div style="padding-top: 12px; padding-bottom: 36px;">
+  <md-divider></md-divider>
+</div>

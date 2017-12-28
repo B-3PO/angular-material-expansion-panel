@@ -340,7 +340,7 @@ $scope.$on("mdExpansionPanelExpanding", function($event, componentId) {
 
 ```
 <md-expansion-panel-expanded
-  [height=""]>
+  [height=""] [lazy-render=""]>
 ...
 </md-expansion-panel-expanded>
 ```xpansion-panel>
@@ -351,6 +351,7 @@ $scope.$on("mdExpansionPanelExpanding", function($event, componentId) {
 | Param | Type | Details |
 | :--: | :--: | :--: |
 | height | number= | <p>add this attribute set the max height of the expanded content. The container will be set to scroll</p>  |
+| lazy-render | boolean= | <p>if this attribute is present the content of mdExpansionPanelExpanded will be compiled when the mdExpansionPanel expands</p>  |
 
 
 
