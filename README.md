@@ -302,7 +302,22 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 | :--: | :--: | :--: |
 | md-component-id | string= | <p>add an id if you want to acces the panel via the <code>$mdExpansionPanel</code> service</p>  |
 
+#### Events
 
+`mdExpansionPanel` emits the following events:
+
+* `mdExpansionPanelExpanding`: when it starts to expand
+* `mdExpansionPanelExpanded`: when it has finished expanding
+* `mdExpansionPanelCollapsing`: when it starts to collapsed
+* `mdExpansionPanelCollapsed`: when it has finished to collapse
+
+The `md-component-id` of the concerned `md-expansion-panel` will be passed as argument.
+
+```js
+$scope.$on("mdExpansionPanelExpanding", function($event, componentId) {
+	...
+})
+```
 
 
 ## <a name="mdExpansionPanelCollapsed"></a> mdExpansionPanelCollapsed
@@ -325,7 +340,7 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 
 ```
 <md-expansion-panel-expanded
-  [height=""]>
+  [height=""] [lazy-render=""]>
 ...
 </md-expansion-panel-expanded>
 ```xpansion-panel>
@@ -336,6 +351,7 @@ angular.module('myApp', ['ngMaterial', 'material.components.expansionPanels']);
 | Param | Type | Details |
 | :--: | :--: | :--: |
 | height | number= | <p>add this attribute set the max height of the expanded content. The container will be set to scroll</p>  |
+| lazy-render | boolean= | <p>if this attribute is present the content of mdExpansionPanelExpanded will be compiled when the mdExpansionPanel expands</p>  |
 
 
 

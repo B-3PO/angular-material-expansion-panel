@@ -41,3 +41,6 @@ bower_components
 # sass cache
 .gulp-scss-cache
 .sass-cache
+
+## ctags file
+tags
